@@ -1,4 +1,46 @@
-%%%%%%%%%%%%%%%%%%%## io da riga 59 a riga 102%%%%%%%
+void vel::Data(void)
+{
+
+	/*ROS topics */
+	this->input_sub = this->Handle.subscriber("/cmd_vel", 1, &odom::input_Msg_Callback, this)
+	this->output_pub = this->Handle.advertise<nav_msgs::odom>("/odom", 1);
+
+	/*Ros services*/
+	this->server = this->Handle.advertiseService("Reset_Odometry", &odom::odomReset_Callback, this);
+
+	/*dynamic reconfigure*/
+	/*dynamic_reconfigure::Server<pub_sub::parametersConfig> dynServer; DA CAPIRE SE È DA AGIUNGERE*/
+	dynamic_reconfigure::Server<Robotics_project1::integration_methodsConfig>::CallbackType f;
+	f = boost::bind(&odom::reconfig_Callback, this, _1, _2);
+	dynServer.setCallback(f);
+
+	/* Initialize node state */
+	this->current_time = ros::Time::now();
+	this->past_time = ros::Time::now();
+
+	this->x = 0.0;
+	this->y = 0.0;
+	this->theta = 0.0;
+
+	this->vel_x = 0.0;
+	this->vel_y = 0.0;
+	this->omega = 0.0;
+
+	this->integration_method = 0;
+
+	ROS_INFO("Node %s ready to run", ros::this_node::getName().c_str());
+}
+
+void odom::RunPeriod(void)
+{
+	ROSI_INFO("Node %s running.", ros::this_node::getName().c_str());
+
+	//Wait other nodes start
+	sleep (1.0);
+
+	ros::spin();
+}
+
 void odom::Stop(void){
 	ROS_INFO("Node %s is closing", ros::this_node::getName().c_str());
 }
@@ -37,14 +79,34 @@ void odom::integration(void){
 	double dt=(this->current_time-this->past_time).toSec();
 	double delta_x, delta_y, delta_theta;
 
+	switch (this->integration_method) {
+		case 0:
+			delta_x = vel_x*dt*std::cos(theta) - vel_y*dt*std::sin(theta);
+			delta_y = vel_x*dt*std::sin(theta) + vel_y*dt*std::cos(theta);
+			delta_theta = omega*dt;
+			break;
+
+		case 1:
+			delta_x = vel_x*dt*std::cos(theta+omega*dt/2) - vel_y*dt*std::sin(theta+omega*dt/2);
+			delta_y = vel_x*dt*std::sin(theta+omega*dt/2) - vel_y*dt*std::cos(theta+omega*dt/2);
+			delta_theta = omega*dt;
+			break;
+
+	}
+
+	this->x += delta_x;
+	this->y += delta_y;
+	this->theta += delta_theta;
+
+	this->past_time = this->current_time;
+
+	ROS_INFO("Suppose pose is [%f,%f,%f], integrated whit method %d", (double)this->x, (double)this->y, (double)this->theta, this->integration_method);
+}
+
+/* DA CONTROLLARE*/ 
+void odom::publish(void){
+	nav_msgs::odom odom_msgs;
 
 
-
-	double wheel_vel[4];
-
-	wheel_vel[]=tick[]*2*3,14159/dt/N/T;
-	this->vel[]=r/4*[1 1 1 1; -1 1 1 -1; -1/(l+w) 1/(l+w) -1/(l+w) 1/(l+w)]*wheel_vel[];
-
-	this->past_time=this->current_time;
-	this->past_pos=this->current_pos;
+	output_pub.publish(odom_msgs);
 }

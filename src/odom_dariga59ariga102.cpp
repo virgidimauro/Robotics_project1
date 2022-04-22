@@ -1,3 +1,8 @@
+#include "odo/odo.h"
+
+#include <dynamic_reconfigure/server.h>
+#include <Robotics_project1/integration_methodsConfig.h>
+
 void vel::Data(void)
 {
 

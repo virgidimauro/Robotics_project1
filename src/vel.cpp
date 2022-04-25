@@ -54,3 +54,10 @@ void vel::vel_computation(void){
 	this->past_time=this->current_time;
 	this->past_pos=this->current_pos;
 }
+
+void vel::publish(void){
+	geometry_msgs::TwistStamped cmd_vel;
+
+
+	output_pub.publish(cmd_vel);
+}

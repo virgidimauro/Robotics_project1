@@ -3,15 +3,15 @@ void vel::Data(void)
 {
 
 	/*ROS topics */
-	this->input_sub = this->Handle.subscriber("/wheels_msg", 1000, &vel::input_Msg_Callback, this)
+	this->input_sub = this->Handle.subscriber("/wheels_msg", 1000, &vel::inputMsg_Callback, this)
 	this->output_pub = this->Handle.advertise<nav_msgs::vel>("/vel", 1000);
 
 	/* Initialize node state */
 	this->current_time = ros::Time::now();
 	this->past_time = ros::Time::now();
 
-	this->position_curr[] = 0.0;
-	this->position_past[] = 0.0;
+	this->current_pos[] = 0.0;
+	this->past_pos[] = 0.0;
 	double r = 0.07,lx = 0.2, ly = 0.169, T = 5, N = 42;
 
 	ROSI_INFO("Node %s ready to run.", ros::this_node::getName().c_str());
@@ -53,4 +53,11 @@ void vel::vel_computation(void){
 
 	this->past_time=this->current_time;
 	this->past_pos=this->current_pos;
+}
+
+void vel::publish(void){
+	geometry_msgs:TwistStamped cmd_vel;
+
+
+	output_pub.publish(cmd_vel);
 }

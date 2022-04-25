@@ -16,8 +16,8 @@ private:
 	ros::Publisher output_pub;
 
 	void inputMsg_Callback(const sensor_msgs::JointState::ConstPtr& wheels_msg);
-	void publish(void);
 	void vel_computation(void);
+	void publish(void);
 
 	ros::Time current_time,past_time;
 

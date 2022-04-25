@@ -1,0 +1,12 @@
+<launch>
+  <node pkg="tf_examples" type = "tf2_broad" name = "tf_broad"/>
+  <node pkg="turtlesim" type = "turtlesim_node" name = "turtlesim_node"/> //da cambiare node e type
+  <node pkg="turtlesim" type = "turtle_teleop_key" name = "turtle_teleop_key"/> //da cambiare node e type
+  
+  <node pkg="tf2_ros" type="static_transform_publisher" name="back_right" args="0.3 -0.3 0 0 0 0 1 turtle FRleg " /> //modificare parametri
+  <node pkg="tf2_ros" type="static_transform_publisher" name="front_right" args="0.3 0.3 0 0 0 0 1 turtle FLleg " /> //modificare parametri
+  <node pkg="tf2_ros" type="static_transform_publisher" name="front_left" args="-0.3 0.3 0 0 0 0 1 turtle BLleg " /> //modificare parametri
+  <node pkg="tf2_ros" type="static_transform_publisher" name="back_left" args="-0.3 -0.3 0 0 0 0 1 turtle BRleg " /> //modificare parametri
+
+</launch>
+

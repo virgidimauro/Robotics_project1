@@ -56,6 +56,7 @@ void vel::vel_computation(void){
 }
 
 void vel::publish(void){
+
 	geometry_msgs:TwistStamped cmd_vel;
 
 

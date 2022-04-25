@@ -108,9 +108,8 @@ void odom::integration(void){
 	ROS_INFO("Suppose pose is [%f,%f,%f], integrated whit method %d", (double)this->x, (double)this->y, (double)this->theta, this->integration_method);
 }
 
-/* DA CONTROLLARE*/ 
 void odom::publish(void){
-	nav_msgs::odom odom_msgs;
+	nav_msgs::Odometry odom_msgs;
 
 
 	output_pub.publish(odom_msgs);

@@ -1,0 +1,8 @@
+prefix=/home/virginia/robotics/src/project1/Robotics_project1/install
+
+Name: projectone
+Description: Description of projectone
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

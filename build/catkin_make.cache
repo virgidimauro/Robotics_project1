@@ -1,0 +1,2 @@
+projectone
+-DCATKIN_DEVEL_PREFIX=/home/virginia/robotics/src/project1/Robotics_project1/devel -DCMAKE_INSTALL_PREFIX=/home/virginia/robotics/src/project1/Robotics_project1/install -G Unix Makefiles

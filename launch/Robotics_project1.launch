@@ -1,6 +1,0 @@
-<launch>
-
-    <node pkg="Robotics_project1" type="vel_node" name="vel" output="screen"/>
-    <node pkg="Robotics_project1" type="odom_node" name="odom" output="screen"/>
-
-</launch>

@@ -1,7 +1,6 @@
 #include "odom/odom.h"
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv){
 	ros::init(argc, argv, NODE_NAME);
 
 	odom odom_node;

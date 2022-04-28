@@ -7,7 +7,7 @@ void vel::Data(void)
 {
 
 	/*ROS topics */
-	this->input_sub = this->Handle.subscriber("/cmd_vel", 1, &odom::input_Msg_Callback, this)
+	this->input_sub = this->Handle.subscribe("/cmd_vel", 1, &odom::input_Msg_Callback, this)
 	this->output_pub = this->Handle.advertise<nav_msgs::odom>("/odom", 1);
 
 	/*Ros services*/
@@ -88,7 +88,7 @@ void odom::integration(void){
 		case 0:
 			delta_x = vel_x*dt*std::cos(theta) - vel_y*dt*std::sin(theta);
 			delta_y = vel_x*dt*std::sin(theta) + vel_y*dt*std::cos(theta);
-			delta_theta = omega*dt;
+			delta_theta = omega*dt;intintegrationegration
 			break;
 
 		case 1:

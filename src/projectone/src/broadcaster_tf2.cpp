@@ -1,14 +1,14 @@
 #include "ros/ros.h"
-#include "turtlesim/Pose.h" //sostituire con posizione world robot
+#include "Robotics_project1/odom.h" //pacchetto (turtlesim/Pose.h)
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
-#include <geometry_msgs/TransformStamped.h>
+#include <geometry_msgs/TransformStamped.h> 
 
 class TfBroad
 {
 public:
   TfBroad() {
-    sub = n.subscribe("/turtle1/pose", 1000, &TfBroad::callback, this);
+    sub = n.subscribe("/odom", 1000, &TfBroad::callback, this); //cambiato da /turtle1/pose
     //sostituire turtle1/pose con la posizione base_link
   }
 
@@ -16,13 +16,13 @@ public:
     // set header
     transformStamped.header.stamp = ros::Time::now();
     transformStamped.header.frame_id = "world"; //odom
-    transformStamped.child_frame_id = "turtle"; //base_link
+    transformStamped.child_frame_id = "robot"; 
     // set x,y
     transformStamped.transform.translation.x = msg->x;
     transformStamped.transform.translation.y = msg->y;
     transformStamped.transform.translation.z = 0.0; 
     // set theta
-    tf2::Quaternion q;
+    tf2::Quaternion q;  //tf2 da cambiare
     q.setRPY(0, 0, msg->theta);
     transformStamped.transform.rotation.x = q.x();
     transformStamped.transform.rotation.y = q.y();
@@ -34,9 +34,9 @@ public:
 
 private:
   ros::NodeHandle n; 
-  tf2_ros::TransformBroadcaster br;
+  tf2_ros::TransformBroadcaster br; //tf2_ros da cambiare
   geometry_msgs::TransformStamped transformStamped;
-  ros::Subscriber sub;
+  ros::Subscriber input_sub;
 };
 
 

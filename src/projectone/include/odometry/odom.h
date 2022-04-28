@@ -37,7 +37,7 @@ private:
 
 	ros::Time current_time,past_time;
 
-	int wayofintegrating;
+	int integration_method;
 	double x,y,theta;
 	double vel_x,vel_y, ome;
 

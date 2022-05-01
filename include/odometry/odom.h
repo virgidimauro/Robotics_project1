@@ -1,35 +1,30 @@
-#ifndef ODOM_H
-#define ODOM_H
-
 #include "ros/ros.h"
 #include "std.msgs/Float64MultiArray.h"
 #include "std.msgs/Float64.h"
 #include "geometry_msgs/TwistStamped.h"
-#include "nav_msgs/odom.h" /*NON SO SE VA Odometri.h */
-
+#include "nav_msgs/Odometry.h"
 #include "Robotics_project1/Reset_Odometry.h"
 #include <dynamic_reconfigure/server.h>
 #include <Robotics_project1/integration_methodsConfig.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
 
-#define NODE_NAME "odom"
 
 class odom {
 private:
-	ros::NodeHandle Handle;
+	ros::NodeHandle n;
 	/*Ros topics*/
-	ros::Subscriber input_sub;
-	ros::Publisher output_pub;
+	ros::Subscriber sub;
+	ros::Publisher pub;
 
 	/*Ros service*/
 	ros::ServiceServer server;
 	/*dyn reconfig server*/
 	dynamic_reconfigure::Server<Robotics_project1::integration_methodsConfig> dynServer;
 	/*tf broadcaster*/
-	tf2_ros:TransformBroadcaster broadc_odom;
+	tf2_ros::TransformBroadcaster broadc_odom;
 	/*parameters from Ros parameter server*/
-	double loopRate;
+	double loop_rate;
 	/*Ros topic callbacks*/
 	void inputMsg_Callback(const geometry_msgs::TwistStamped::ConstPtr& cmd_vel);
 	/*Ros service callbacks*/
@@ -52,8 +47,6 @@ public:
 	void Stop(void);
 
 };
-
-#endif
 
 /*nuovooo
 #ifndef ODOMETRY_H

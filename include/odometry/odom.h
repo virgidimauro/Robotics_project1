@@ -5,7 +5,7 @@
 #include "std.msgs/Float64MultiArray.h"
 #include "std.msgs/Float64.h"
 #include "geometry_msgs/TwistStamped.h"
-#include "nav_msgs/odom.h" /*NON SO SE VA Odometri.h MI SEMBRA STRANO PERCHE ANCHE LORO CON MAIUSCOLA*/
+#include "nav_msgs/odom.h" /*NON SO SE VA Odometri.h */
 
 #include "Robotics_project1/Reset_Odometry.h"
 #include <dynamic_reconfigure/server.h>
@@ -55,7 +55,7 @@ public:
 
 #endif
 
-/*NUOVOOOOOOOO
+/*nuovooo
 #ifndef ODOMETRY_H
 #define ODOMETRY_H
 

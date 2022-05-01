@@ -24,14 +24,14 @@ private:
         double quaty= true_pose->pose.orientation.y;
         double quatz= true_pose->pose.orientation.z;
         double quatw= true_pose->pose.orientation.w;
-	
-	tf2::Quaternion q(quatx, quaty, quatz, quatw);
+    
+        tf2::Quaternion q(quatx, quaty, quatz, quatw);
         tf2::Matrix3x3 m(q);
 
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
 
-	this->theta = yaw;
+        this->theta = yaw;
 
         resetFunction();
     };
@@ -39,13 +39,13 @@ private:
     
     void resetFunction(){
         srv.request.x = this->x;
-	srv.request.y = this->y;
+        srv.request.y = this->y;
         srv.request.theta = this->theta;
 
-   	      
+          
         if (client.call(srv))
         {
-          ROS_INFO("Old pose: [%f, %f, %f]", (double)srv.response.x, (double)srv.response.y, (double)srv.response.theta);
+          ROS_INFO("I heard pose [%f, %f, %f],\nold pose was: [%f, %f, %f]", this->x, this->y, this->theta, (double)srv.response.x, (double)srv.response.y, (double)srv.response.theta);
             this->published = true;
         }
         else
@@ -68,7 +68,7 @@ public:
     
     void main_loop(){
         sleep(1.0);
-        ros::Rate rate(20);
+        ros::Rate rate(1);
         
         ROS_INFO("Node %s running.", ros::this_node::getName().c_str());
         while(!published&&ros::ok()){

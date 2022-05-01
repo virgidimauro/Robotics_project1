@@ -93,7 +93,7 @@ void odom::integration(void){
 		case 0:
 			delta_x = vel_x*dt*std::cos(theta) - vel_y*dt*std::sin(theta);
 			delta_y = vel_x*dt*std::sin(theta) + vel_y*dt*std::cos(theta);
-			delta_theta = omega*dt;
+			delta_theta = omega*dt;intintegrationegration
 			break;
 
 		case 1:

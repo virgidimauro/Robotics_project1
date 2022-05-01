@@ -1,6 +1,30 @@
-<launch>
+/*<launch>
 
     <node pkg="Robotics_project1" type="vel_node" respawn="false" name="vel" output="screen"/>
     <node pkg="Robotics_project1" type="odom_node" respawn="false" name="odom" output="screen"/>
+
+</launch>*/
+
+NUOVO
+<launch>
+  <!--- Run project1 nodes -->
+  
+  <rosparam file="$(find project1)/parameters/node_loop_rate_params.yaml" command="load" />
+  <rosparam file="$(find project1)/parameters/robot_params.yaml" command="load" />
+
+
+  <node pkg="project1" type="velocity" respawn="false" name="velocity" />
+
+  <node pkg="project1" type="inv_velocity" respawn="false" name="inv_velocity"  />
+  
+  <node pkg="project1" type="odometer" respawn="false" name="odometer"  />
+  
+  <node pkg="project1" type="reset_client" respawn="false" name="reset_client"  />
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_map" args="0 0 0 0 0 0 1 world map " />
+  
+  <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 1 map odom " />
+
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find project1)/rviz/project1.rviz" />
 
 </launch>

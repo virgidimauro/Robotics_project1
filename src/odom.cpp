@@ -69,13 +69,13 @@ private:
 			case 0:
 				delta_x = vel_x*dt*std::cos(theta) - vel_y*dt*std::sin(theta);
 				delta_y = vel_x*dt*std::sin(theta) + vel_y*dt*std::cos(theta);
-				delta_theta = omega*dt;
+				delta_theta = ome*dt;
 				break;
 
 			case 1:
-				delta_x = vel_x*dt*std::cos(theta+omega*dt/2) - vel_y*dt*std::sin(theta+omega*dt/2);
-				delta_y = vel_x*dt*std::sin(theta+omega*dt/2) - vel_y*dt*std::cos(theta+omega*dt/2);
-				delta_theta = omega*dt;
+				delta_x = vel_x*dt*std::cos(theta+ome*dt/2) - vel_y*dt*std::sin(theta+ome*dt/2);
+				delta_y = vel_x*dt*std::sin(theta+ome*dt/2) - vel_y*dt*std::cos(theta+ome*dt/2);
+				delta_theta = ome*dt;
 				break;
 
 		}
@@ -146,14 +146,13 @@ public:
 	void Data(void){
 
 		/*ROS topics */
-		this->sub = this->n.subscribe("/cmd_vel", 1, &odom::input_Msg_Callback, this)
+		this->sub = this->n.subscribe("/cmd_vel", 1, &odom::inputMsg_Callback, this)
 		this->pub = this->n.advertise<nav_msgs::Odometry>("/odom", 1);
 
 		/*Ros services*/
 		this->server = this->n.advertiseService("Reset_Odometry", &odom::odomReset_Callback, this);
 
 		/*dynamic reconfigure*/
-		/*dynamic_reconfigure::Server<pub_sub::parametersConfig> dynServer; DA CAPIRE SE È DA AGIUNGERE*/
 		dynamic_reconfigure::Server<Robotics_project1::integration_methodsConfig>::CallbackType f;
 		f = boost::bind(&odom::reconfig_Callback, this, _1, _2);
 		dynServer.setCallback(f);
@@ -168,7 +167,7 @@ public:
 
 		this->vel_x = 0.0;
 		this->vel_y = 0.0;
-		this->omega = 0.0;
+		this->ome = 0.0;
 
 		this->int_choice = 0;
 
@@ -200,4 +199,4 @@ int main(int argc, char **argv){
 	//odom_node.Stop();
 
 	return(0);
-}
+} 

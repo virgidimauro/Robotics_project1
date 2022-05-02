@@ -1,6 +1,6 @@
 # Robot parameters
-  /omnirobot/l: 0.4           # x distance from the center
-  /omnirobot/w: 0.338         # y distance from the center
-  /omnirobot/r: 0.07          # wheel radius
-  /omnirobot/T: 5
-  /omnirobot/N: 42
+  /OmnidirectionalRobot/l: 0.4           # x distance from the center
+  /OmnidirectionalRobot/w: 0.338         # y distance from the center
+  /OmnidirectionalRobot/r: 0.07          # wheel radius
+  /OmnidirectionalRobot/T: 5
+  /OmnidirectionalRobot/N: 42

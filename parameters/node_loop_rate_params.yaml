@@ -1,2 +1,2 @@
 # Definition of nodes' loop rates
-/velocity/LoopRate: 10 #Hz
+/vel/loop_rate: 10 #Hz

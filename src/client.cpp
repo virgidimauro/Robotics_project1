@@ -28,11 +28,11 @@ private:
         tf2::Matrix3x3 mat(q);
 
         double roll, pitch, yaw;
-        m.getRPY(roll, pitch, yaw);
+        mat.getRPY(roll, pitch, yaw);
 
         this->theta = yaw;
 
-        resetFunction();
+        resetpose();
     };
     
     
@@ -45,7 +45,7 @@ private:
         if (client.call(srv))
         {
           ROS_INFO("New pose is [%f, %f, %f], while old pose was: [%f, %f, %f]", this->x, this->y, this->theta, (double)srv.response.x, (double)srv.response.y, (double)srv.response.theta);
-            this->published = true;
+            this->pub = true;
         }
         else
         {
@@ -60,20 +60,20 @@ public:
       // all initializations here
         ros::NodeHandle m;
         this->pub = false;
-        this->subscriber = this->n.subscribe("/robot/pose", 1, &Reset::pose_Callback, this);
-        this->client = n.serviceClient<Robotics_project1::Reset_odom>("Reset_odom");
+        this->subscriber = this->m.subscribe("/robot/pose", 1, &Reset::pose_Callback, this);
+        this->client = m.serviceClient<Robotics_project1::Reset_odom>("Reset_odom");
         ROS_INFO("Node %s ready to run.", ros::this_node::getName().c_str());
     };
     
     void main_loop(){
         sleep(1.0);
-        ros::Rate rate(1);
+        ros::Rate r(2);
         
         ROS_INFO("Node %s running.", ros::this_node::getName().c_str());
         while(!pub&&ros::ok()){
             
             ros::spinOnce();
-            rate.sleep();
+            r.sleep();
             
         };
         

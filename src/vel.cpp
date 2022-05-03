@@ -1,6 +1,8 @@
 #include "ros/ros.h"
 #include "sensor_msgs/JointState.h"
 #include "geometry_msgs/TwistStamped.h"
+#include <dynamic_reconfigure/server.h>
+#include <Robotics_project1/calibrationConfig.h>
 
 class vel  { //header of the class
 	private: 
@@ -9,13 +11,25 @@ class vel  { //header of the class
     /* ROS topics */
     ros::Subscriber sub;
     ros::Publisher pub;
+    /*dyn reconfig server*/
+	dynamic_reconfigure::Server<Robotics_project1::calibrationConfig> dynServer;
 
     /* ROS topic callbacks */
     void inputMsg_Callback(const sensor_msgs::JointState::ConstPtr& wheels_msg) {
 		/*reads msg and stores info*/
 		for(int j=0;j<4;j++){
-			this->current_pos[j]=wheels_msg-> pos[j];
+			this->current_pos[j]=wheels_msg-> position[j];
 		};
+	};
+
+	void parameters_Callback(Robotics_project1::calibrationConfig &config,uint32_t level){
+		ROS_INFO("Requested to reconfigure: l=%f, w=%f, r=%f, T=%d, N=%d - Level %d", config.l, config.w, config.r, config.T, config.N, level);
+	    
+	    this->l = config.l;
+	    this->w = config.w;
+	    this->r = config.r;
+	    this->T = config.T;
+	    this->N = config.N;
 	};
  
     /*auxiliary functions*/
@@ -38,17 +52,24 @@ class vel  { //header of the class
 		double matrix_fromwheelveltovel_xyz[3][4]={{r/4, r/4, r/4, r/4},{-r/4,r/4,r/4,-r/4},{(-r/4)/(l+w),(r/4)/(l+w),-(r/4)/(l+w),(r/4)/(l+w)}}; /*CHECK IF OK EVEN IF r/4 out of parentheses*/
 		for(int i=0;i<3;i++)
 			vel_xyz[i]=0;
-		for(int=i=0;i<3;i++){
-			for(int=j=0;j<4;j++){
+		for(int i=0;i<3;i++){
+			for(int j=0;j<4;j++){
 				wheel_vel[j]=tick[j]*2*3,14159/dt/N/T;
 				this->vel_xyz[i]=this->vel_xyz[i]+matrix_fromwheelveltovel_xyz[i][j]*wheel_vel[j];
 			};
 		};
+		ROS_INFO("supposed velocity is [%f,%f,%f]", (double)this->vel[0], (double)this->vel[1], (double)this->vel[2]);
+
+	    this->past_time = this->current_time;
+
+	    for(int j = 0; j<4; j++){
+	        this->past_pos[j] = this->current_pos[j];
+	    };
 	};	
 
     void publish(void){
 
-		geometry_msgs:TwistStamped cmd_vel;
+		geometry_msgs::TwistStamped cmd_vel;
 
 		cmd_vel.header.stamp=this->current_time;
 		cmd_vel.header.frame_id="robot";
@@ -64,19 +85,19 @@ class vel  { //header of the class
     
     
     /* Node state variables */
-    double loop_rate;
     ros::Time current_time, past_time;
     
     double current_pos[4];
     double past_pos[4];
     double vel_xyz[3];
-    double l, w, r, T, N;
+    int T, N; //or they might be double CHECK!!!!
+    double l, w, r;
     
 
   public:
 	void Data(void){
 
-		/*recover parameters from Ros parameter server*/
+		/*recover parameters from Ros parameter server
 		std::string name;
 		std::string shortname="OmnidirectionalRobot";
 
@@ -102,12 +123,17 @@ class vel  { //header of the class
 
 		name= shortname+"/N";
 		if (false==n.getParam(name,N))
-			ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());
+			ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str()); */
 
 
 		/*ROS topics */
-		this->sub = this->n.subscribe("/wheels_msg", 1, &vel::inputMsg_Callback, this)
+		this->sub = this->n.subscribe("/wheels_msg", 1, &vel::inputMsg_Callback, this);
 		this->pub = this->n.advertise<geometry_msgs::TwistStamped>("/cmd_vel", 1);
+
+		/*dynamic reconfigure*/
+		dynamic_reconfigure::Server<Robotics_project1::calibrationConfig>::CallbackType f;
+		f = boost::bind(&vel::parameters_Callback, this, _1, _2);
+		dynServer.setCallback(f);
 
 		/* Initialize node state */
 		this->current_time = ros::Time::now();
@@ -132,18 +158,22 @@ class vel  { //header of the class
 	void RunPeriod(void){
 		ROS_INFO("Node %s running.", ros::this_node::getName().c_str());
 
-		ros::Rate loop_rate (this->loop_rate)/*anche questa new IN ALTERNATIVA A RIGA 66*/
+		ros::Rate loop_rate(10); /*anche questa new IN ALTERNATIVA A RIGA 66*/
 
 		//Wait other nodes to start
 		sleep (1.0);
 
-		/*ros::Rate r(10);*/
+		//initialize ticks
+		ros::spinOnce();
+		for(int j=0;j<4;j++)
+			this->past_pos[j] = this->current_pos[j];
+		sleep(0.5);
 
 		while (ros::ok()){
 			ros::spinOnce();
 			vel_computation(); /*NB PRIMA C'ERA vel:: anche questa new*/
 			publish(); /*NB PRIMA C'ERA vel::*/
-			loop_rate.sleep(); /*anche questa new Loop era r*/
+			loop_rate.sleep();
 		};
 	};
   	void Stop(void){
@@ -154,9 +184,9 @@ class vel  { //header of the class
 int main (int argc, char **argv) {
 	ros::init(argc,argv, "vel");
 	vel vel_node;
-	/*vel_node.Data();
+	vel_node.Data();
 	vel_node.RunPeriod();
-	vel_node.Stop();*/
+	vel_node.Stop();
 
 	return (0);
 }

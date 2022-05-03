@@ -1,6 +1,6 @@
 #include "ros/ros.h"
-#include "std.msgs/Float64MultiArray.h"
-#include "std.msgs/Float64.h"
+#include "std_msgs/Float64MultiArray.h"
+#include "std_msgs/Float64.h"
 #include "geometry_msgs/TwistStamped.h"
 #include "nav_msgs/Odometry.h"
 #include "Robotics_project1/Reset_odom.h"
@@ -27,7 +27,7 @@ private:
 	/*parameters from Ros parameter server*/
 	double loop_rate;
 	/*Ros topic callbacks*/
-	void inputMsg_Callback(const geometry_msgs::TwistedStamped::ConstPtr& cmd_vel) {
+	void inputMsg_Callback(const geometry_msgs::TwistStamped::ConstPtr& cmd_vel) {
 		this->current_time = cmd_vel->header.stamp;
 
 		integration(); /*c'era odom::*/
@@ -57,7 +57,7 @@ private:
 
 	/*dyn reconfig callback*/
 	void reconfig_Callback(Robotics_project1::integration_methodsConfig &config,uint32_t level){
-		ROS_INFO("Requested to reconfigure: %d - level %d", integration_methodsConfig,level);
+		ROS_INFO("Requested to reconfigure: %d - level %d", config.int_choice,level);
 		this->int_choice=config.int_choice;
 	};
 
@@ -86,7 +86,7 @@ private:
 
 		this->past_time = this->current_time;
 
-		ROS_INFO("Estimated pose is [%f,%f,%f], integrated with method %d", (double)this->x, (double)this->y, (double)this->theta, this->int_choice);
+		ROS_INFO("Estimated pose is [%f,%f,%f], integrated with method %d, where 0 is Euler and 1 is Rugge-Kutta", (double)this->x, (double)this->y, (double)this->theta, this->int_choice);
 	};
 
 	void publish(void){
@@ -109,7 +109,7 @@ private:
 	     transformation.transform.rotation.w = q.w();
 
 	     //send the transform
-	     odom_broadcaster.sendTransform(transformation);
+	     broadc_odom.sendTransform(transformation);
 
 	     //next, we'll publish the odometry message over ROS
 	     nav_msgs::Odometry odom;
@@ -146,7 +146,7 @@ public:
 	void Data(void){
 
 		/*ROS topics */
-		this->sub = this->n.subscribe("/cmd_vel", 1, &odom::inputMsg_Callback, this)
+		this->sub = this->n.subscribe("/cmd_vel", 1, &odom::inputMsg_Callback, this);
 		this->pub = this->n.advertise<nav_msgs::Odometry>("/odom", 1);
 
 		/*Ros services*/
@@ -174,7 +174,7 @@ public:
 		ROS_INFO("Node %s ready to run", ros::this_node::getName().c_str());
 	};
 	void RunPeriod(void){
-		ROSI_INFO("Node %s running.", ros::this_node::getName().c_str());
+		ROS_INFO("Node %s running.", ros::this_node::getName().c_str());
 
 		//Wait other nodes start
 		sleep (1.0);
@@ -192,11 +192,11 @@ int main(int argc, char **argv){
 
 	odom odom_node;
 
-	//odom_node.Data();
+	odom_node.Data();
 
-	//odom_node.RunPeriod();
+	odom_node.RunPeriod();
 
-	//odom_node.Stop();
+	odom_node.Stop();
 
 	return(0);
 } 

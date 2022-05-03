@@ -1,32 +1,31 @@
 #include "ros/ros.h"
-#include "project1/Reset_Odometry.h"
+#include "Robotics_project1/Reset_odom.h"
 #include "geometry_msgs/PoseStamped.h"
 #include "tf2/LinearMath/Matrix3x3.h"
 
-
 class Reset {
 private:
-    ros::NodeHandle n;
-    ros::Subscriber sub;
+    ros::NodeHandle m;
+    ros::Subscriber subscriber;
     ros::ServiceClient client;
-    project1::Reset_Odometry srv;
+    Robotics_project1::Reset_odom srv;
     
-    bool published;
+    bool pub;
     
     double x,y,theta;
 
-    void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& true_pose) {
+    void pose_Callback(const geometry_msgs::PoseStamped::ConstPtr& true_pose) {
         
         this->x = true_pose->pose.position.x;
         this->y = true_pose->pose.position.y;
 
-        double quatx= true_pose->pose.orientation.x;
-        double quaty= true_pose->pose.orientation.y;
-        double quatz= true_pose->pose.orientation.z;
-        double quatw= true_pose->pose.orientation.w;
+        double quaternion_x= true_pose->pose.orientation.x;
+        double quaternion_y= true_pose->pose.orientation.y;
+        double quaternion_z= true_pose->pose.orientation.z;
+        double quaternion_w= true_pose->pose.orientation.w;
     
-        tf2::Quaternion q(quatx, quaty, quatz, quatw);
-        tf2::Matrix3x3 m(q);
+        tf2::Quaternion q(quaternion_x, quaternion_y, quaternion_z, quaternion_w);
+        tf2::Matrix3x3 mat(q);
 
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
@@ -37,7 +36,7 @@ private:
     };
     
     
-    void resetFunction(){
+    void resetpose(){
         srv.request.x = this->x;
         srv.request.y = this->y;
         srv.request.theta = this->theta;
@@ -45,12 +44,12 @@ private:
           
         if (client.call(srv))
         {
-          ROS_INFO("I heard pose [%f, %f, %f],\nold pose was: [%f, %f, %f]", this->x, this->y, this->theta, (double)srv.response.x, (double)srv.response.y, (double)srv.response.theta);
+          ROS_INFO("New pose is [%f, %f, %f], while old pose was: [%f, %f, %f]", this->x, this->y, this->theta, (double)srv.response.x, (double)srv.response.y, (double)srv.response.theta);
             this->published = true;
         }
         else
         {
-          ROS_ERROR("Failed to call service reset_odometry, retry");
+          ROS_ERROR("Failed to call service Reset_odom");
         }
     };
     
@@ -59,10 +58,10 @@ private:
 public:
     Reset() { // class constructor
       // all initializations here
-        ros::NodeHandle n;
-        this->published = false;
-        this->sub = this->n.subscribe("/robot/pose", 1, &Reset::poseCallback, this);
-        this->client = n.serviceClient<project1::Reset_Odometry>("reset_odometry");
+        ros::NodeHandle m;
+        this->pub = false;
+        this->subscriber = this->n.subscribe("/robot/pose", 1, &Reset::pose_Callback, this);
+        this->client = n.serviceClient<Robotics_project1::Reset_odom>("Reset_odom");
         ROS_INFO("Node %s ready to run.", ros::this_node::getName().c_str());
     };
     
@@ -71,7 +70,7 @@ public:
         ros::Rate rate(1);
         
         ROS_INFO("Node %s running.", ros::this_node::getName().c_str());
-        while(!published&&ros::ok()){
+        while(!pub&&ros::ok()){
             
             ros::spinOnce();
             rate.sleep();
@@ -87,11 +86,11 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "reset_client");
     
-    Reset my_reset;
+    Reset reset_node;
     
-    my_reset.main_loop();
+    reset_node.main_loop();
     
-    ROS_INFO("node reset_client is shutting down");
+    ROS_INFO("node reset_node is shutting down");
 
   return 0;
 }

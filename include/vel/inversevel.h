@@ -1,23 +1,15 @@
-#ifndef INVERSEVEL_H
-#define INVERSEVEL_H
-
 #include "ros/ros.h"
-
 #include "geometry_msgs/TwistStamped.h"
 #include "Robotics_project1/w_rpm.h"
-
-
-#define NAME_OF_THIS_NODE "inversevel"
-
 
 class inversevel  //header of the class
 {
   private: 
-    ros::NodeHandle Handle;
+    ros::NodeHandle n;
 
     /* ROS topics */
-    ros::Subscriber input_sub;
-    ros::Publisher output_pub;
+    ros::Subscriber sub;
+    ros::Publisher pub;
 
     /* ROS topic callbacks */
     void input_MsgCallback(const geometry_msgs::TwistStamped::ConstPtr& cmd_vel);
@@ -36,11 +28,7 @@ class inversevel  //header of the class
 
   public:
     void Data(void);
-    
     void RunPeriod(void);
-    
     void Stop(void);
 
 };
-
-#endif

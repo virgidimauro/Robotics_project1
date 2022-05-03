@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(project1)
+project(Robotics_project1)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -55,14 +55,14 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
  add_message_files(
    FILES
-   Wrpm.msg
-   ParamMsg.msg
+   w_rpm.msg
+   param.msg
  )
 
 ## Generate services in the 'srv' folder
  add_service_files(
    FILES
-   Reset_Odometry.srv
+   Reset_odom.srv
  )
 
 ## Generate actions in the 'action' folder
@@ -108,7 +108,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES project1
+  LIBRARIES Robotics_project1
   CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
   DEPENDS system_lib
 )
@@ -151,16 +151,16 @@ include_directories(
 
 ## Specify libraries to link a library or executable target against
  
-## odometer
- add_executable(odometer src/Odometer.cpp src/odom_node.cpp)
- add_dependencies(odometer ${catkin_EXPORTED_TARGETS})
- target_link_libraries(odometer ${catkin_LIBRARIES})
+## odometry
+ add_executable(odom src/odom.cpp)
+ add_dependencies(odom ${catkin_EXPORTED_TARGETS})
+ target_link_libraries(odom ${catkin_LIBRARIES})
 
  
 ## velocity
- add_executable(velocity src/velocity.cpp src/velocity_node.cpp)
- add_dependencies(velocity ${catkin_EXPORTED_TARGETS})
- target_link_libraries(velocity ${catkin_LIBRARIES})
+ add_executable(vel src/vel.cpp)
+ add_dependencies(vel ${catkin_EXPORTED_TARGETS})
+ target_link_libraries(vel ${catkin_LIBRARIES})
  
 ## reset client
  add_executable(reset_client src/client.cpp)
@@ -168,14 +168,14 @@ include_directories(
  target_link_libraries(reset_client ${catkin_LIBRARIES})
  
 ## inverse velocity
- add_executable(inv_velocity src/inv_velocity.cpp src/inv_velocity_node.cpp)
- add_dependencies(inv_velocity ${catkin_EXPORTED_TARGETS})
- target_link_libraries(inv_velocity ${catkin_LIBRARIES})
+ add_executable(inversevel src/inversevel.cpp)
+ add_dependencies(inversevel ${catkin_EXPORTED_TARGETS})
+ target_link_libraries(inversevel ${catkin_LIBRARIES})
 
  ## calibrator
- add_executable(calibrator src/calibration.cpp)
- add_dependencies(calibrator ${catkin_EXPORTED_TARGETS})
- target_link_libraries(calibrator ${catkin_LIBRARIES})
+ ##add_executable(calibrator src/calibration.cpp)
+ ##add_dependencies(calibrator ${catkin_EXPORTED_TARGETS})
+ ##target_link_libraries(calibrator ${catkin_LIBRARIES})
 
 
  

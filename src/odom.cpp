@@ -3,12 +3,12 @@
 #include "std.msgs/Float64.h"
 #include "geometry_msgs/TwistStamped.h"
 #include "nav_msgs/Odometry.h"
-#include "Robotics_project1/Reset_Odometry.h"
+#include "Robotics_project1/Reset_odom.h"
 #include <dynamic_reconfigure/server.h>
 #include <Robotics_project1/integration_methodsConfig.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
-
+ 
 //CONTROLARE BROADCAST PUBLISH
 
 class odom {
@@ -41,7 +41,7 @@ private:
 	};
 
 	/*Ros service callbacks*/
-	bool odomReset_Callback(Robotics_project1::Reset_Odometry::Request& request,Robotics_project1::Reset_Odometry::Response& response){
+	bool odomReset_Callback(Robotics_project1::Reset_odom::Request& request,Robotics_project1::Reset_odom::Response& response){
 		response.x=this->x;
 		response.y=this->y;
 		response.theta=this->theta;
@@ -150,7 +150,7 @@ public:
 		this->pub = this->n.advertise<nav_msgs::Odometry>("/odom", 1);
 
 		/*Ros services*/
-		this->server = this->n.advertiseService("Reset_Odometry", &odom::odomReset_Callback, this);
+		this->server = this->n.advertiseService("Reset_odom", &odom::odomReset_Callback, this);
 
 		/*dynamic reconfigure*/
 		dynamic_reconfigure::Server<Robotics_project1::integration_methodsConfig>::CallbackType f;

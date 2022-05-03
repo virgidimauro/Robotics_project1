@@ -2,7 +2,7 @@
 #include "geometry_msgs/TwistStamped.h"
 #include "Robotics_project1/w_rpm.h"
 #include <dynamic_reconfigure/server.h>
-#include <Robotics_project1/calibrationConfig.h>
+#include <Robotics_project1/parameters_calibrationConfig.h>
 
 class inversevel  //header of the class
 {
@@ -13,7 +13,7 @@ class inversevel  //header of the class
     ros::Subscriber sub;
     ros::Publisher pub;
     /*dyn reconfig server*/
-		dynamic_reconfigure::Server<Robotics_project1::calibrationConfig> dynServer;
+		dynamic_reconfigure::Server<Robotics_project1::parameters_calibrationConfig> dynServer;
 
     /* ROS topic callbacks */
     void inputMsg_Callback(const geometry_msgs::TwistStamped::ConstPtr& cmd_vel) {
@@ -26,7 +26,7 @@ class inversevel  //header of the class
 			inversevel::publish();
 		};
 
-    void parameters_Callback(Robotics_project1::calibrationConfig &config,uint32_t level){
+    void parameters_Callback(Robotics_project1::parameters_calibrationConfig &config,uint32_t level){
 			ROS_INFO("Requested to reconfigure: l=%f, w=%f, r=%f, T=%d, N=%d - Level %d", config.l, config.w, config.r, config.T, config.N, level);
 		    
 		    this->l = config.l;
@@ -99,8 +99,8 @@ class inversevel  //header of the class
 			this->pub = this->n.advertise<Robotics_project1::w_rpm>("/wheels_rpm", 1);
 
 			/*dynamic reconfigure*/
-			dynamic_reconfigure::Server<Robotics_project1::calibrationConfig>::CallbackType f;
-			f = boost::bind(&vel::parameters_Callback, this, _1, _2);
+			dynamic_reconfigure::Server<Robotics_project1::parameters_calibrationConfig>::CallbackType f;
+			f = boost::bind(&inversevel::parameters_Callback, this, _1, _2);
 			dynServer.setCallback(f);
 
 			/* Initialize node state */

@@ -2,7 +2,7 @@
 #include "sensor_msgs/JointState.h"
 #include "geometry_msgs/TwistStamped.h"
 #include <dynamic_reconfigure/server.h>
-#include <Robotics_project1/calibrationConfig.h>
+#include <Robotics_project1/parameters_calibrationConfig.h>
 
 class vel  { //header of the class
 	private: 
@@ -12,7 +12,7 @@ class vel  { //header of the class
     ros::Subscriber sub;
     ros::Publisher pub;
     /*dyn reconfig server*/
-	dynamic_reconfigure::Server<Robotics_project1::calibrationConfig> dynServer;
+	dynamic_reconfigure::Server<Robotics_project1::parameters_calibrationConfig> dynServer;
 
     /* ROS topic callbacks */
     void inputMsg_Callback(const sensor_msgs::JointState::ConstPtr& wheels_msg) {
@@ -22,7 +22,7 @@ class vel  { //header of the class
 		};
 	};
 
-	void parameters_Callback(Robotics_project1::calibrationConfig &config,uint32_t level){
+	void parameters_Callback(Robotics_project1::parameters_calibrationConfig &config,uint32_t level){
 		ROS_INFO("Requested to reconfigure: l=%f, w=%f, r=%f, T=%d, N=%d - Level %d", config.l, config.w, config.r, config.T, config.N, level);
 	    
 	    this->l = config.l;
@@ -58,7 +58,7 @@ class vel  { //header of the class
 				this->vel_xyz[i]=this->vel_xyz[i]+matrix_fromwheelveltovel_xyz[i][j]*wheel_vel[j];
 			};
 		};
-		ROS_INFO("supposed velocity is [%f,%f,%f]", (double)this->vel[0], (double)this->vel[1], (double)this->vel[2]);
+		ROS_INFO("supposed velocity is [%f,%f,%f]", (double)this->vel_xyz[0], (double)this->vel_xyz[1], (double)this->vel_xyz[2]);
 
 	    this->past_time = this->current_time;
 
@@ -131,7 +131,7 @@ class vel  { //header of the class
 		this->pub = this->n.advertise<geometry_msgs::TwistStamped>("/cmd_vel", 1);
 
 		/*dynamic reconfigure*/
-		dynamic_reconfigure::Server<Robotics_project1::calibrationConfig>::CallbackType f;
+		dynamic_reconfigure::Server<Robotics_project1::parameters_calibrationConfig>::CallbackType f;
 		f = boost::bind(&vel::parameters_Callback, this, _1, _2);
 		dynServer.setCallback(f);
 

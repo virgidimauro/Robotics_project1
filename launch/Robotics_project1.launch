@@ -2,7 +2,7 @@
   <!--- Run Robotics_project1 nodes -->
   
   <rosparam file="$(find Robotics_project1)/parameters/node_loop_rate_params.yaml" command="load" />
-  <rosparam file="$(find Robotics_project1)/parameters/robot_params.yaml" command="load" />
+  <rosparam file="$(find Robotics_project1)/parameters/robot_param.yaml" command="load" />
 
 
   <node pkg="Robotics_project1" type="vel" respawn="false" name="vel" />
@@ -16,7 +16,5 @@
   <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_map" args="0 0 0 0 0 0 1 world map " />
   
   <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 1 map odom " />
-
-  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find project1)/rviz/project1.rviz" />
-
+  
 </launch>

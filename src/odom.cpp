@@ -8,8 +8,6 @@
 #include <Robotics_project1/integration_methodsConfig.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
- 
-//CONTROLARE BROADCAST PUBLISH
 
 class odom {
 private:
@@ -28,7 +26,7 @@ private:
 	double loop_rate;
 	/*Ros topic callbacks*/
 	void inputMsg_Callback(const geometry_msgs::TwistStamped::ConstPtr& cmd_vel) {
-		this->current_time = cmd_vel->header.stamp;
+		this->next_time = cmd_vel->header.stamp;
 
 		integration(); /*c'era odom::*/
 		publish(); /*c'era odom::*/
@@ -37,7 +35,7 @@ private:
 		this->vel_y=cmd_vel-> twist.linear.y;
 		this->ome=cmd_vel-> twist.angular.z;
 
-		this->past_time = this->current_time;
+		this->previous_time = this->next_time;
 	};
 
 	/*Ros service callbacks*/
@@ -62,9 +60,8 @@ private:
 	};
 
 	void integration(void){
-		double dt=(this->current_time-this->past_time).toSec();
+		double dt=(this->next_time-this->previous_time).toSec();
 		double delta_x, delta_y, delta_theta;
-
 		switch (this->int_choice) {
 			case 0:
 				delta_x = vel_x*dt*std::cos(theta) - vel_y*dt*std::sin(theta);
@@ -84,7 +81,7 @@ private:
 		this->y += delta_y;
 		this->theta += delta_theta;
 
-		this->past_time = this->current_time;
+		this->previous_time = this->next_time;
 
 		ROS_INFO("Estimated pose is [%f,%f,%f], integrated with method %d, where 0 is Euler and 1 is Rugge-Kutta", (double)this->x, (double)this->y, (double)this->theta, this->int_choice);
 	};
@@ -96,7 +93,7 @@ private:
 
 	     //first, we'll publish the transform over tf
 	     geometry_msgs::TransformStamped transformation;
-	     transformation.header.stamp = this->current_time;
+	     transformation.header.stamp = this->next_time;
 	     transformation.header.frame_id = "odom";
 	     transformation.child_frame_id = "base_link";
 
@@ -113,7 +110,7 @@ private:
 
 	     //next, we'll publish the odometry message over ROS, needed for rviz
 	     nav_msgs::Odometry odom;
-	     odom.header.stamp = this->current_time;
+	     odom.header.stamp = this->next_time;
 	     odom.header.frame_id = "odom";
 
 	     //set the pose
@@ -136,7 +133,7 @@ private:
 	    
 	};
 
-	ros::Time current_time,past_time;
+	ros::Time next_time,previous_time;
 
 	int int_choice;
 	double x,y,theta;
@@ -158,8 +155,8 @@ public:
 		dynServer.setCallback(f);
 
 		/* Initialize node state */
-		this->current_time = ros::Time::now();
-		this->past_time = ros::Time::now();
+		this->next_time = ros::Time::now();
+		this->previous_time = ros::Time::now();
 
 		this->x = 0.0;
 		this->y = 0.0;

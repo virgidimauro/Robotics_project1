@@ -18,7 +18,7 @@ class vel  { //header of the class
     void inputMsg_Callback(const sensor_msgs::JointState::ConstPtr& wheels_msg) {
 		/*reads msg and stores info*/
 		for(int j=0;j<4;j++){
-			this->current_pos[j]=wheels_msg-> position[j];
+			this->next_pos[j]=wheels_msg-> position[j];
 		};
 	};
 
@@ -34,20 +34,20 @@ class vel  { //header of the class
  
     /*auxiliary functions*/
     void vel_computation(void){
-		this->current_time=ros::Time::now();
-		double dt=(this->current_time-this->past_time).toSec();
-		/*double tick[]=this->current_pos[]-this->past_pos[]; VECCHIA VERSIONE IN ALTERNATIVA A RIGHE 97-100*/
+		this->next_time=ros::Time::now();
+		double dt=(this->next_time-this->previous_time).toSec();
+		/*double tick[]=this->next_pos[]-this->previous_pos[]; VECCHIA VERSIONE IN ALTERNATIVA A RIGHE 97-100*/
 		double tick[4];
 		for(int j=0;j<4;j++){
-			tick[j]=this->current_pos[j]-this->past_pos[j];
+			tick[j]=this->next_pos[j]-this->previous_pos[j];
 		};
 		double wheel_vel[4];
 
 		/*wheel_vel[]=tick[]*2*3,14159/dt/N/T;
 		this->vel[]=r/4*[1 1 1 1; -1 1 1 -1; -1/(l+w) 1/(l+w) -1/(l+w) 1/(l+w)]*wheel_vel[];
 
-		this->past_time=this->current_time; /*questa ora è riga 120
-		this->past_pos=this->current_pos; VECCHIA VERSIONE di 109-117 MA SCRITTURA MAT SBAGLIATA*/
+		this->previous_time=this->next_time; /*questa ora è riga 120
+		this->previous_pos=this->next_pos; VECCHIA VERSIONE di 109-117 MA SCRITTURA MAT SBAGLIATA*/
 
 		double matrix_fromwheelveltovel_xyz[3][4]={{r/4, r/4, r/4, r/4},{-r/4,r/4,r/4,-r/4},{(-r/4)/(l+w),(r/4)/(l+w),-(r/4)/(l+w),(r/4)/(l+w)}}; /*CHECK IF OK EVEN IF r/4 out of parentheses*/
 		for(int i=0;i<3;i++)
@@ -60,10 +60,10 @@ class vel  { //header of the class
 		};
 		ROS_INFO("supposed velocity is [%f,%f,%f]", (double)this->vel_xyz[0], (double)this->vel_xyz[1], (double)this->vel_xyz[2]);
 
-	    this->past_time = this->current_time;
+	    this->previous_time = this->next_time;
 
 	    for(int j = 0; j<4; j++){
-	        this->past_pos[j] = this->current_pos[j];
+	        this->previous_pos[j] = this->next_pos[j];
 	    };
 	};	
 
@@ -71,7 +71,7 @@ class vel  { //header of the class
 
 		geometry_msgs::TwistStamped cmd_vel;
 
-		cmd_vel.header.stamp=this->current_time;
+		cmd_vel.header.stamp=this->next_time;
 		cmd_vel.header.frame_id="robot";
 		cmd_vel.twist.linear.x=this->vel_xyz[0];
 		cmd_vel.twist.linear.y=this->vel_xyz[1];
@@ -85,10 +85,10 @@ class vel  { //header of the class
     
     
     /* Node state variables */
-    ros::Time current_time, past_time;
+    ros::Time next_time, previous_time;
     
-    double current_pos[4];
-    double past_pos[4];
+    double next_pos[4];
+    double previous_pos[4];
     double vel_xyz[3];
     int T, N; //or they might be double CHECK!!!!
     double l, w, r;
@@ -136,11 +136,11 @@ class vel  { //header of the class
 		dynServer.setCallback(f);
 
 		/* Initialize node state */
-		this->current_time = ros::Time::now();
-		this->past_time = ros::Time::now();
+		this->next_time = ros::Time::now();
+		this->previous_time = ros::Time::now();
 
-		/*this->current_pos[] = 0.0;
-		this->past_pos[] = 0.0;
+		/*this->next_pos[] = 0.0;
+		this->previous_pos[] = 0.0;
 		double r = 0.07,lx = 0.2, ly = 0.169, T = 5, N = 42;  VECCHIA VERSIONE in alternativa a da riga 46 a 52*/
 
 		for(int j=0;j<4;j++){
@@ -148,8 +148,8 @@ class vel  { //header of the class
 		};
 
 		for(int j=0;j<4;j++){
-			this->current_pos[j] = 0.0;
-			this->past_pos[j] = 0.0;
+			this->next_pos[j] = 0.0;
+			this->previous_pos[j] = 0.0;
 		}; /*NUOVA VERSIONE da riga 46 a 52*/
 
 		ROS_INFO("Node %s ready to run.", ros::this_node::getName().c_str());
@@ -166,7 +166,7 @@ class vel  { //header of the class
 		//initialize ticks
 		ros::spinOnce();
 		for(int j=0;j<4;j++)
-			this->past_pos[j] = this->current_pos[j];
+			this->previous_pos[j] = this->next_pos[j];
 		sleep(0.5);
 
 		while (ros::ok()){

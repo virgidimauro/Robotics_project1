@@ -111,12 +111,12 @@ private:
 	     //send the transform
 	     broadc_odom.sendTransform(transformation);
 
-	     //next, we'll publish the odometry message over ROS
+	     //next, we'll publish the odometry message over ROS, needed for rviz
 	     nav_msgs::Odometry odom;
 	     odom.header.stamp = this->current_time;
 	     odom.header.frame_id = "odom";
 
-	     //set the position
+	     //set the pose
 	     odom.pose.pose.position.x = this->x;
 	     odom.pose.pose.position.y = this->y;
 	     odom.pose.pose.position.z = 0.0;

@@ -15,10 +15,10 @@ class vel  { //header of the class
 	dynamic_reconfigure::Server<Robotics_project1::parameters_calibrationConfig> dynServer;
 
     /* ROS topic callbacks */
-    void inputMsg_Callback(const sensor_msgs::JointState::ConstPtr& wheels_msg) {
+    void inputMsg_Callback(const sensor_msgs::JointState::ConstPtr& wheel_state) {
 		/*reads msg and stores info*/
-		for(int j=0;j<4;j++){
-			this->next_pos[j]=wheels_msg-> position[j];
+		for(int i=0;i<4;i++){
+			this->next_pos[i] = wheel_state->position[i];
 		};
 	};
 
@@ -66,7 +66,7 @@ class vel  { //header of the class
 	        this->previous_pos[j] = this->next_pos[j];
 	    };
 	};	
-
+	
     void publish(void){
 
 		geometry_msgs::TwistStamped cmd_vel;
@@ -127,7 +127,7 @@ class vel  { //header of the class
 
 
 		/*ROS topics */
-		this->sub = this->n.subscribe("/wheels_msg", 1, &vel::inputMsg_Callback, this);
+		this->sub = this->n.subscribe("/wheel_states", 1, &vel::inputMsg_Callback, this);
 		this->pub = this->n.advertise<geometry_msgs::TwistStamped>("/cmd_vel", 1);
 
 		/*dynamic reconfigure*/

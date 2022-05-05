@@ -15,6 +15,15 @@ class inversevel  //header of the class
     /*dyn reconfig server*/
 		dynamic_reconfigure::Server<Robotics_project1::parameters_calibrationConfig> dynServer;
 
+
+		/* Node state variables */
+    
+    double vel_x, vel_y, ome;
+    double ome_fl, ome_fr, ome_rl, ome_rr;
+    //int T,N; //or they might be double CHECK!!!!
+    double l, w, r, T, N;
+
+
     /* ROS topic callbacks */
     void inputMsg_Callback(const geometry_msgs::TwistStamped::ConstPtr& cmd_vel) {
 			/*reads msg and stores info*/
@@ -22,8 +31,8 @@ class inversevel  //header of the class
 			this->vel_y = cmd_vel->twist.linear.y;
 			this->ome = cmd_vel->twist.angular.z;
 
-			inversevel::inversevel_computation();
-			inversevel::publish();
+			inversevel_computation();
+			publish();
 		};
 
     void parameters_Callback(Robotics_project1::parameters_calibrationConfig &config,uint32_t level){
@@ -38,10 +47,10 @@ class inversevel  //header of the class
 
     /*auxiliary functions*/
     void inversevel_computation(void){
-			this->ome_fl=T/r*(vel_x-vel_y-ome*(l+w));
-			this->ome_fr=T/r*(vel_x+vel_y+ome*(l+w));
-			this->ome_rl=T/r*(vel_x+vel_y-ome*(l+w));;
-			this->ome_rr=T/r*(vel_x-vel_y+ome*(l+w));
+			this->ome_fl=T/r*(vel_x-vel_y-ome*(l+w))*30/3.14159;
+			this->ome_fr=T/r*(vel_x+vel_y+ome*(l+w))*30/3.14159;
+			this->ome_rl=T/r*(vel_x+vel_y-ome*(l+w))*30/3.14159;
+			this->ome_rr=T/r*(vel_x-vel_y+ome*(l+w))*30/3.14159;
 			
 			ROS_INFO("estimated wheels' velocities Wfl,Wfr,Wrl,Wrr are [%f, %f, %f, %f]", (double)this->ome_fl, (double)this->ome_fr, (double)this->ome_rl, (double)this->ome_rr);
 		};
@@ -56,43 +65,10 @@ class inversevel  //header of the class
 
 			pub.publish(wheels_rpm);
 		};
-	    
-    
-    /* Node state variables */
-    
-    double vel_x, vel_y, ome;
-    double ome_fl, ome_fr, ome_rl, ome_rr;
-    int T,N; //or they might be double CHECK!!!!
-    double l, w, r;
     
 
   public:
     void Data(void){
-
-			/*recover parameters from Ros parameter server
-			std::string name;
-			std::string shortname="OmnidirectionalRobot";
-
-			name= shortname+"/l";
-			if (false==n.getParam(name,l))
-				ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());
-
-			name= shortname+"/w";
-			if (false==n.getParam(name,w))
-				ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());
-
-			name= shortname+"/r";
-			if (false==n.getParam(name,r))
-				ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());
-
-			name= shortname+"/T";
-			if (false==n.getParam(name,T))
-				ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());
-
-			name= shortname+"/N";
-			if (false==n.getParam(name,N))
-				ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str()); */
-
 
 			/*ROS topics */
 			this->sub = this->n.subscribe("/cmd_vel", 1, &inversevel::inputMsg_Callback, this);
@@ -112,19 +88,19 @@ class inversevel  //header of the class
 			this->ome_rl=0;
 			this->ome_rr=0;
 			
-			ROS_INFO("Node %s ready to run.", ros::this_node::getName().c_str());
+			//ROS_INFO("Node %s ready to run.", ros::this_node::getName().c_str());
 		};
     void RunPeriod(void){
-			ROS_INFO("Node %s running.", ros::this_node::getName().c_str());
+			//ROS_INFO("Node %s running.", ros::this_node::getName().c_str());
 
 			//Wait other nodes to start
 			sleep (1.0);
 			ros::spin(); 
 
 		};
-    void Stop(void){
+    /*void Stop(void){
 			ROS_INFO("Node %s is closing", ros::this_node::getName().c_str());
-		};
+		};*/
 
 };
 
@@ -133,7 +109,7 @@ int main (int argc, char **argv) {
 	inversevel inversevel_node;
 	inversevel_node.Data();
 	inversevel_node.RunPeriod();
-	inversevel_node.Stop();
+	//inversevel_node.Stop();
 
 	return (0);
 }

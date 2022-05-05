@@ -4,3 +4,8 @@
   /OmnidirectionalRobot/r: 0.07          # wheel radius
   /OmnidirectionalRobot/T: 5
   /OmnidirectionalRobot/N: 42
+
+#Robot initial pose
+  /OmnidirectionalRobot/inital_pose/x:  0.0
+  /OmnidirectionalRobot/inital_pose/y:  0.0
+  /OmnidirectionalRobot/inital_pose/theta:  0.0

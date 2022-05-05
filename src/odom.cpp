@@ -24,12 +24,23 @@ private:
 	tf2_ros::TransformBroadcaster broadc_odom;
 	/*parameters from Ros parameter server*/
 	double loop_rate;
+
+
+
+	ros::Time next_time,previous_time;
+
+	int int_choice;
+	double x,y,theta;
+	double vel_x,vel_y, ome;
+
+
+
 	/*Ros topic callbacks*/
 	void inputMsg_Callback(const geometry_msgs::TwistStamped::ConstPtr& cmd_vel) {
 		this->next_time = cmd_vel->header.stamp;
 
-		integration(); /*c'era odom::*/
-		publish(); /*c'era odom::*/
+		integration();
+		publish();
 
 		this->vel_x=cmd_vel-> twist.linear.x;
 		this->vel_y=cmd_vel-> twist.linear.y;
@@ -133,17 +144,27 @@ private:
 	    
 	};
 
-	ros::Time next_time,previous_time;
-
-	int int_choice;
-	double x,y,theta;
-	double vel_x,vel_y, ome;
-
 public:
 	void Data(void){
 
+		//recover parameters from Ros parameter server
+		std::string name;
+		std::string shortname="OmnidirectionalRobot/initial_pose";
+
+		name= shortname+"/x";
+		if (false==n.getParam(name,x))
+			ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());
+
+		name= shortname+"/y";
+		if (false==n.getParam(name,y))
+			ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());
+
+		name= shortname+"/theta";
+		if (false==n.getParam(name,theta))
+			ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());
+
 		/*ROS topics */
-		this->sub = this->n.subscribe("/cmd_vel", 1, &odom::inputMsg_Callback, this);
+		this->sub = this->n.subscribe("/cmd_vel", 10, &odom::inputMsg_Callback, this);
 		this->pub = this->n.advertise<nav_msgs::Odometry>("/odom", 1);
 
 		/*Ros services*/
@@ -158,9 +179,9 @@ public:
 		this->next_time = ros::Time::now();
 		this->previous_time = ros::Time::now();
 
-		this->x = 0.0;
-		this->y = 0.0;
-		this->theta = 0.0;
+		//this->x = 0.0;
+		//this->y = 0.0;
+		//this->theta = 0.0;
 
 		this->vel_x = 0.0;
 		this->vel_y = 0.0;
@@ -168,10 +189,10 @@ public:
 
 		this->int_choice = 0;
 
-		ROS_INFO("Node %s ready to run", ros::this_node::getName().c_str());
+		//ROS_INFO("Node %s ready to run", ros::this_node::getName().c_str());
 	};
 	void RunPeriod(void){
-		ROS_INFO("Node %s running.", ros::this_node::getName().c_str());
+		//ROS_INFO("Node %s running.", ros::this_node::getName().c_str());
 
 		//Wait other nodes start
 		sleep (1.0);
@@ -179,9 +200,9 @@ public:
 		ros::spin();
 	};
 
-	void Stop(void){
+	/*void Stop(void){
 		ROS_INFO("Node %s is closing", ros::this_node::getName().c_str());
-	};
+	};*/
 };
 
 int main(int argc, char **argv){
@@ -193,7 +214,7 @@ int main(int argc, char **argv){
 
 	odom_node.RunPeriod();
 
-	odom_node.Stop();
+	//odom_node.Stop();
 
 	return(0);
 } 

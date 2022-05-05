@@ -85,19 +85,20 @@ class vel  { //header of the class
     
     
     /* Node state variables */
+    double loop_rate;
     ros::Time next_time, previous_time;
     
     double next_pos[4];
     double previous_pos[4];
     double vel_xyz[3];
-    int T, N; //or they might be double CHECK!!!!
-    double l, w, r;
+    //int T; //or they might be double CHECK!!!!
+    double l, w, r, N, T;
     
 
   public:
 	void Data(void){
 
-		/*recover parameters from Ros parameter server
+		//recover parameters from Ros parameter server
 		std::string name;
 		std::string shortname="OmnidirectionalRobot";
 
@@ -105,7 +106,7 @@ class vel  { //header of the class
 		if (false==n.getParam(name,loop_rate))
 		 	ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());
 
-		name= shortname+"/l";
+		/*name= shortname+"/l";
 		if (false==n.getParam(name,l))
 			ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());
 
@@ -138,6 +139,7 @@ class vel  { //header of the class
 		/* Initialize node state */
 		this->next_time = ros::Time::now();
 		this->previous_time = ros::Time::now();
+		//this->T = 5;
 
 		/*this->next_pos[] = 0.0;
 		this->previous_pos[] = 0.0;
@@ -150,15 +152,15 @@ class vel  { //header of the class
 		for(int j=0;j<4;j++){
 			this->next_pos[j] = 0.0;
 			this->previous_pos[j] = 0.0;
-		}; /*NUOVA VERSIONE da riga 46 a 52*/
+		};
 
-		ROS_INFO("Node %s ready to run.", ros::this_node::getName().c_str());
+		//ROS_INFO("Node %s ready to run.", ros::this_node::getName().c_str());
 	};
 
 	void RunPeriod(void){
-		ROS_INFO("Node %s running.", ros::this_node::getName().c_str());
+		//ROS_INFO("Node %s running.", ros::this_node::getName().c_str());
 
-		ros::Rate loop_rate(10); /*anche questa new IN ALTERNATIVA A RIGA 66*/
+		ros::Rate loop_rate(this->loop_rate);
 
 		//Wait other nodes to start
 		sleep (1.0);
@@ -176,9 +178,9 @@ class vel  { //header of the class
 			loop_rate.sleep();
 		};
 	};
-  	void Stop(void){
+  	/*void Stop(void){
 		ROS_INFO("Node %s is closing", ros::this_node::getName().c_str());
-	};
+	};*/
 };
       
 int main (int argc, char **argv) {
@@ -186,7 +188,7 @@ int main (int argc, char **argv) {
 	vel vel_node;
 	vel_node.Data();
 	vel_node.RunPeriod();
-	vel_node.Stop();
+	//vel_node.Stop();
 
 	return (0);
 }

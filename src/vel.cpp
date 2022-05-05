@@ -15,10 +15,10 @@ class vel  { //header of the class
 	dynamic_reconfigure::Server<Robotics_project1::parameters_calibrationConfig> dynServer;
 
     /* ROS topic callbacks */
-    void inputMsg_Callback(const sensor_msgs::JointState::ConstPtr& wheel_state) {
+    void inputMsg_Callback(const sensor_msgs::JointState::ConstPtr& wheels_msg) {
 		/*reads msg and stores info*/
 		for(int i=0;i<4;i++){
-			this->next_pos[i] = wheel_state->position[i];
+			this->next_pos[i] = wheels_msg->position[i];
 		};
 	};
 

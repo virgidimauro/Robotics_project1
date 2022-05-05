@@ -127,7 +127,7 @@ class vel  { //header of the class
 
 
 		/*ROS topics */
-		this->sub = this->n.subscribe("/wheels_msg", 1, &vel::inputMsg_Callback, this);
+		this->sub = this->n.subscribe("/wheel_states", 1, &vel::inputMsg_Callback, this);
 		this->pub = this->n.advertise<geometry_msgs::TwistStamped>("/cmd_vel", 1);
 
 		/*dynamic reconfigure*/

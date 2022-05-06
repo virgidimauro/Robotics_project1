@@ -1,0 +1,4 @@
+# Robot initial pose
+  /OmnidirectionalRobot/initial_pose/x: 0.0    
+  /OmnidirectionalRobot/initial_pose/y: 0.0    
+  /OmnidirectionalRobot/initial_pose/theta: 0.0  

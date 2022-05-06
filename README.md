@@ -1,3 +1,0 @@
-# projectone
-# ciaoooooo
-# ciao sbirgi

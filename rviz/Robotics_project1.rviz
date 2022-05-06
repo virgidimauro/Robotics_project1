@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /Odometry1
+        - /Pose1
       Splitter Ratio: 0.5
     Tree Height: 514
   - Class: rviz/Selection
@@ -147,7 +148,7 @@ Visualization Manager:
       Axes Length: 1
       Axes Radius: 0.10000000149011612
       Class: rviz/Pose
-      Color: 255; 25; 0
+      Color: 115; 210; 22
       Enabled: true
       Head Length: 0.30000001192092896
       Head Radius: 0.10000000149011612
@@ -195,11 +196,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 10.931503295898438
+      Scale: 39.97389221191406
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
-      X: 19.107580184936523
-      Y: -5.475669860839844
+      X: 0.4469212591648102
+      Y: -0.16295459866523743
     Saved: ~
 Window Geometry:
   Displays:
@@ -217,5 +218,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1469
-  X: 69
+  X: 284
   Y: 34

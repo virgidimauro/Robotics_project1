@@ -18,37 +18,31 @@ private:
         
         this->x = true_pose->pose.position.x;
         this->y = true_pose->pose.position.y;
-
         double quaternion_x= true_pose->pose.orientation.x;
         double quaternion_y= true_pose->pose.orientation.y;
         double quaternion_z= true_pose->pose.orientation.z;
         double quaternion_w= true_pose->pose.orientation.w;
-    
         tf2::Quaternion q(quaternion_x, quaternion_y, quaternion_z, quaternion_w);
         tf2::Matrix3x3 mat(q);
-
         double roll, pitch, yaw;
         mat.getRPY(roll, pitch, yaw);
-
         this->theta = yaw;
-
         resetpose();
     };
     
     
     void resetpose(){
+
         srv.request.x = this->x;
         srv.request.y = this->y;
         srv.request.theta = this->theta;
 
           
-        if (client.call(srv))
-        {
+        if (client.call(srv)) {
           ROS_INFO("New pose is [%f, %f, %f], while old pose was: [%f, %f, %f]", this->x, this->y, this->theta, (double)srv.response.x, (double)srv.response.y, (double)srv.response.theta);
             this->pub = true;
         }
-        else
-        {
+        else {
           ROS_ERROR("Failed to call service Reset_odom");
         }
     };
@@ -62,35 +56,23 @@ public:
         this->pub = false;
         this->subscriber = this->m.subscribe("/robot/pose", 1, &Reset::pose_Callback, this);
         this->client = m.serviceClient<Robotics_project1::Reset_odom>("Reset_odom");
-        ROS_INFO("Node %s ready to run.", ros::this_node::getName().c_str());
     };
     
     void main_loop(){
         sleep(1.0);
-        ros::Rate r(2);
-        
-        ROS_INFO("Node %s running.", ros::this_node::getName().c_str());
+        ros::Rate looprate(2);
+        //ROS_INFO("Node %s running.", ros::this_node::getName().c_str());
         while(!pub&&ros::ok()){
-            
             ros::spinOnce();
-            r.sleep();
-            
+            looprate.sleep();
         };
-        
     };
-    
 };
 
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv){
     ros::init(argc, argv, "reset_client");
-    
     Reset reset_node;
-    
     reset_node.main_loop();
-    
-    ROS_INFO("node reset_node is shutting down");
-
-  return 0;
+    return 0;
 }

@@ -14,6 +14,19 @@ class vel  { //header of the class
     /*dyn reconfig server*/
 	dynamic_reconfigure::Server<Robotics_project1::parameters_calibrationConfig> dynServer;
 
+
+	/* Node state variables */
+    double loop_rate;
+    ros::Time next_time, previous_time;
+    
+    double next_pos[4];
+    double previous_pos[4];
+    double vel_xyz[3];
+    //int T; //or they might be double CHECK!!!!
+    double l, w, r, N, T;
+
+
+
     /* ROS topic callbacks */
     void inputMsg_Callback(const sensor_msgs::JointState::ConstPtr& wheels_msg) {
 		/*reads msg and stores info*/
@@ -35,7 +48,7 @@ class vel  { //header of the class
     /*auxiliary functions*/
     void vel_computation(void){
 		this->next_time=ros::Time::now();
-		double dt=(this->next_time-this->previous_time).toSec();
+		double dt=(this->next_time - this->previous_time).toSec();
 		/*double tick[]=this->next_pos[]-this->previous_pos[]; VECCHIA VERSIONE IN ALTERNATIVA A RIGHE 97-100*/
 		double tick[4];
 		for(int j=0;j<4;j++){
@@ -54,7 +67,7 @@ class vel  { //header of the class
 			vel_xyz[i]=0;
 		for(int i=0;i<3;i++){
 			for(int j=0;j<4;j++){
-				wheel_vel[j]=tick[j]*2*3,14159/dt/N/T;
+				wheel_vel[j]=tick[j]/dt*2*3.14159/N/T;
 				this->vel_xyz[i]=this->vel_xyz[i]+matrix_fromwheelveltovel_xyz[i][j]*wheel_vel[j];
 			};
 		};
@@ -64,7 +77,7 @@ class vel  { //header of the class
 
 	    for(int j = 0; j<4; j++){
 	        this->previous_pos[j] = this->next_pos[j];
-	    };
+	    }; //for each wheel
 	};	
 	
     void publish(void){
@@ -82,17 +95,6 @@ class vel  { //header of the class
 
 		pub.publish(cmd_vel);
 	};
-    
-    
-    /* Node state variables */
-    double loop_rate;
-    ros::Time next_time, previous_time;
-    
-    double next_pos[4];
-    double previous_pos[4];
-    double vel_xyz[3];
-    //int T; //or they might be double CHECK!!!!
-    double l, w, r, N, T;
     
 
   public:

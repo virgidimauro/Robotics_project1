@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /Odometry1
       Splitter Ratio: 0.5
     Tree Height: 514
   - Class: rviz/Selection
@@ -184,7 +185,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: -1.5799989700317383
+      Angle: -1.5699989795684814
       Class: rviz/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
@@ -194,11 +195,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 57.400272369384766
+      Scale: 10.931503295898438
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
-      X: -0.6160957217216492
-      Y: -1.2422715425491333
+      X: 19.107580184936523
+      Y: -5.475669860839844
     Saved: ~
 Window Geometry:
   Displays:

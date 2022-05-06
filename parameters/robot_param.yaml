@@ -5,7 +5,7 @@
   /OmnidirectionalRobot/T: 5
   /OmnidirectionalRobot/N: 42
 
-#Robot initial pose
-  /OmnidirectionalRobot/inital_pose/x:  0.0
-  /OmnidirectionalRobot/inital_pose/y:  0.0
-  /OmnidirectionalRobot/inital_pose/theta:  0.0
+# Robot initial pose
+  /omnirobot/initial_pose/x: 0.0    
+  /omnirobot/initial_pose/y: 0.0    
+  /omnirobot/initial_pose/theta: 0.0  

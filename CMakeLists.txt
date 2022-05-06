@@ -174,9 +174,9 @@ include_directories(
  target_link_libraries(inversevel ${catkin_LIBRARIES})
 
  ## calibrator
- ##add_executable(calibrator src/calibration.cpp)
- ##add_dependencies(calibrator ${catkin_EXPORTED_TARGETS})
- ##target_link_libraries(calibrator ${catkin_LIBRARIES})
+ add_executable(calibrator src/calibration.cpp)
+ add_dependencies(calibrator ${catkin_EXPORTED_TARGETS})
+ target_link_libraries(calibrator ${catkin_LIBRARIES})
 
 
  

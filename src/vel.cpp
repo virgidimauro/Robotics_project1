@@ -54,7 +54,7 @@ class vel  { //header of the class
 			vel_xyz[i]=0;
 		for(int i=0;i<3;i++){
 			for(int j=0;j<4;j++){
-				wheel_vel[j]=tick[j]*2*3,14159/dt/N/T;
+				wheel_vel[j]=tick[j]*2*3.14159/dt/N/T;
 				this->vel_xyz[i]=this->vel_xyz[i]+matrix_fromwheelveltovel_xyz[i][j]*wheel_vel[j];
 			};
 		};

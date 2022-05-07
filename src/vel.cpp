@@ -83,8 +83,10 @@ class vel  { //header of the class
     void publish(void){
 		geometry_msgs::TwistStamped cmd_vel;
 
+		//cmd_vel.header.seq=wheels_msg->header.seq; //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa
+
 		cmd_vel.header.stamp=this->next_time;
-		cmd_vel.header.frame_id="robot";
+		cmd_vel.header.frame_id="base_link";
 		cmd_vel.twist.linear.x=this->vel_xyz[0];
 		cmd_vel.twist.linear.y=this->vel_xyz[1];
 		cmd_vel.twist.linear.z=0.0;
@@ -136,7 +138,7 @@ class vel  { //header of the class
 		while (ros::ok()){
 			ros::spinOnce();
 			vel_computation();
-			publish();
+			publish(); 
 			loop_rate.sleep();
 		};
 	};

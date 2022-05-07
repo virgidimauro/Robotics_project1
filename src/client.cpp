@@ -55,7 +55,7 @@ public:
         ros::NodeHandle m;
         this->pub = false;
         this->subscriber = this->m.subscribe("/robot/pose", 1, &Reset::pose_Callback, this);
-        this->client = m.serviceClient<Robotics_project1::Reset_odom>("Reset_odom");
+//this->client = m.serviceClient<Robotics_project1::Reset_odom>("Reset_odom");
     };
     
     void main_loop(){

@@ -164,21 +164,14 @@ include_directories(
  target_link_libraries(vel ${catkin_LIBRARIES})
  
 ## reset client
- add_executable(reset_client src/client.cpp)
- add_dependencies(reset_client ${catkin_EXPORTED_TARGETS})
- target_link_libraries(reset_client ${catkin_LIBRARIES})
+# add_executable(reset_client src/client.cpp)
+# add_dependencies(reset_client ${catkin_EXPORTED_TARGETS})
+# target_link_libraries(reset_client ${catkin_LIBRARIES})
  
 ## inverse velocity
  add_executable(inversevel src/inversevel.cpp)
  add_dependencies(inversevel ${catkin_EXPORTED_TARGETS})
  target_link_libraries(inversevel ${catkin_LIBRARIES})
-
- ## calibrator
- #add_executable(calibrator src/calibration.cpp)
- #add_dependencies(calibrator ${catkin_EXPORTED_TARGETS})
- #target_link_libraries(calibrator ${catkin_LIBRARIES})
-
-
  
 
 

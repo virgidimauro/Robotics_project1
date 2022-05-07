@@ -1,35 +1,31 @@
 ---------------------------------------TEAM-------------------------------------
 
-    •  Virginia Di Mauro
-    •  Lucia Giusti
+    • 10629060 Virginia Di Mauro
+    • 10667036 Lucia Giusti
     • 10656379 Ignazio Maria Castrignano
 
 
 ------------------------PROJECT STRUCTURE AND COMPONENTS------------------------
 
-First Robotics Project A.Y. 2020/2021
+First Robotics Project A.Y. 2021/2022
 The project consists of a single package, named Robotics_project1.
-Inside the robotics_project1 folder, besides the CMakeLists.txt and package.xml files, there are the cfg, launch, msg, src and srv folders:
+Inside the Robotics_project1 folder, besides the CMakeLists.txt and package.xml files, there are the cfg, launch, msg, src, srv and rviz folders:
 
 
 ---Robotics_project1
 	--- cfg 
 		--- integration_methods.cfg
-		--- parameters_calibration.cf
+		--- parameters_calibration.cfg
 	--- launch
-		--- Robotics_project1.launch
+		--- project1.launch
 	--- msg
-		--- param.msg
 		--- w_rpm.msg
-	--- parameters
-		--- pose_to_zero.yaml
 	--- rviz
 		--- Robotics_project1.rviz
 	--- src
 		--- odom.cpp
 		--- vel.cpp
-		--- client.cpp
-		--- inversel.cpp
+		--- inversevel.cpp
 		--- CMakeLists.txt
 	--- srv
 		--- Reset_odom.srv
@@ -38,82 +34,67 @@ Inside the robotics_project1 folder, besides the CMakeLists.txt and package.xml 
 	--- package.xml
 
 
-The src folder contains the source code for five nodes: 
-odom, vel, client, inversel.
+The src folder contains the source code for three nodes: 
+odom, vel, inversevel.
 
-Nostra*
-vel estimates the linear and the angular velocity of the robot and publishes them in the topic /cmd_vel as TwistStamped messages.
-It listens to the /wheel_states topic published by the bags (sensor_msgs/JoinState messages).
-Therefore, given the /wheel_states from the bags, vel computes the linear and the angular velocity of the robot, referred to the base_link reference system, and publishes them in the /velocities topic as TwistStamped messages, after that it publishes the message in odom.
-To calculate the linear and angular velocities of the wheels, the node converts the encoder ticks using *.
-Using the callback of the dynamic reconfigure server to set the parameters of the robot.
-Vel at the end publish velocity and omega as topic cmd_vel.
+The node vel listens to the /wheel_states topic published by the bags (sensor_msgs/JoinState messages) and estimates the linear and the angular velocity of the robot, referred to the base_link reference system. Then it publishes them in the topic /cmd_vel as TwistStamped messages.
+First, in order to calculate the velocities of the wheels, the node uses the difference between the encoder ticks at the previous instant and the one at the following instant, divided by the difference between the previous instant and the following one, by the gear ratio and by the encoder resolution, then multiplying by 2π. So we get the resulting wheels velocities in rad/s.
+Furthermore, we use these results to compute linear and the angular velocity of the robot by means of the kinematics equations of the omnidirectional robot.
+Lastly, in this node we implement a callback of the dynamic reconfigure server to set the parameters of the robot, calibrating them. These parameters are described in cfg folder in parameters_calibration.cfg.
 
-Loro*
-pub_velocities is subscribed via a message filter to the four topics /motor_speed_fl, /motor_speed_fr, /motor_speed_rl, /motor_speed_fl, using an approximate time synchronization policy (since these are experimental data, it is possible that the time stamps referred to the same instant are not identical, and for this reason an exact time policy would not be appropriated).
-Since the messages published in these four topics are MotorSpeed messages, the robotics_project1 package depends on the robotics_hw1 package.
-Therefore, given the four motors speeds, pub_velocities computes the linear and the angular velocity of the robot, referred to the base_link reference system, and publishes them in the /velocities topic as TwistStamped messages.
-To calculate the linear and angular velocities of the robot, the node converts the motors speeds into the wheels speeds applying the gear reduction ratio (see below how this parameter has been estimated) and uses the differential drive formulas.
-Since in the differential drive kinematics there are two wheels, and in the skid steering kinematics there are four wheels, in order to use the differential drive kinematics formulas, the node replaces vl (velocity of the left wheel in the differential drive kinematics) with the mean of the velocities of the front left and rear left wheels, and does the same for the right side. This approximation is justified, as we theoretically assume that in the skid steering kinematics wheels on the same side have same velocities; however, in a real situation, they will not have the same exact values, and it is necessary to compute the mean between the two values.
-Moreover, in order to use the differential drive formulas, the real baseline is replaced by the apparent baseline, that is the distance between the left and right ICRs (Istantaneous Centers of Rotation) (see below for the estimate of this parameter).
-
-*Nostra
-The odom node estimates the pose of the robot from the TwistStamped messages published in /cmd_vel, and publishes /odom (nav_msgs/Odometry messages).
-It also publishes the transformation between the odom and base_link reference systems.
-It offers a service Reset_odom, to force to reset the pose to a given pose (x,y,theta).
-The odometry is calculated using either Euler or Runge-Kutta integration method, depending on the parameter int_choice which can be set with dynamic reconfigure. 0 for Euler and 1 for Rugge-Kutta integration method, the default method is Euler.
+The odom node estimates the pose of the robot from the TwistStamped messages published in /cmd_vel, and publishes the odometry message on /odom (nav_msgs/Odometry messages).
+The odometry is calculated using either Euler or Runge-Kutta integration method, depending on the parameter int_choice which can be set with dynamic reconfigure (0 for Euler and 1 for Rugge-Kutta integration method, the default method is Euler). int_choice parameter is described in cfg folder in integration_methods.cfg.
 This node also publishes the dynamic transformation between the odom and the base_link reference systems, using a tf2_ros::TransformBroadcaster.
-This node 
-sending the transform publishing the odometru message, needed for rviz
-setting the pose, setting the velocity and publishing the message to odom
-Recover parameters from Ros parameter server (inital_pose.yaml)
+It offers a service Reset_odom which forces to reset the pose to a given pose (x,y,theta) and whose request and response structures are defined in the Reset_odom.srv files in the srv folder.
 
 
-*Loro
-The pub_odometry node is subscribed to the /velocities topic; it reads the linear and angular velocities of the robot and uses them to estimate its pose in the odom reference system and publishes Odometry messages in the /odometry topic and OdometryWithIntegrationMethod messages (defined in the OdometryWithIntegrationMethod.msg file in the msg folder) in the /odometry_cust topic.
-To compute the robot pose, it uses either the Euler or the Runge-Kutta integration method, depending on a parameter which can be set with dynamic reconfigure. The default method is Euler.
-This parameter is described in the parameters.cfg file in the cfg folder (see next paragraph for more details).
-This node also publishes the dynamic transformation between the odom and the base_link reference systems, using a tf::TransformBroadcaster.
-The node also offers two services, whose request and response structures are defined in the ResetOdometryToZero.srv and ResetOdometryToGivenPose.srv files in the srv folder.
+
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 The ResetOdometryToZero service resets the robot position to (0,0) in the odom reference system, keeping unchanged the orientation theta. Its request and response are empty, as the service is not parametric and has not values to be returned.
-The ResetOdometryToGivenPose resets the robot pose to (x,y,theta), where x,y and theta are the three inputs of the service (the service has no output).
-
-*Nostra
-The inversevel node read the velocieties: v_x, v_y and omega subscribing to /cmd vel. 
-It Uses them to estimates the velocities of the wheels and then publishes in a custom message on topic /wheels_rpm.
-Use callbacks of the dybamic reconfigure server to set the parameters of the robot.
-It computates the velocity of the wheels in RPM, revolution per minute, from the velocity of the robot
-
-*Nostra
-Client node 
-
-*Loro
-A little note about the time stamps of the messages: the TwistStamped messages in the topic /velocities, the Odometry messages in the topic /odometry, the OdometryWithIntegrationMethod in the topic /odometry_cust and the StampedTransform between odom and base_link all carry a time stamp which is not referred to the instant they are published (as would be with header.stamp = ros::Time::now()), but to the instant when the sensor data were published as MotorSpeed messages (for the sake of simplicity, they carry the time stamp of the MotorSpeed message from the /motor_speed_fl topic).
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 
 
-In the launch folder it is provided a launch file, named Robotics_project1.launch (see below for details).
+The inversevel node reads the velocities: v_x, v_y and omega subscribing to /cmd vel. It uses them to estimate the velocities of the wheels and then publishes in a custom message on topic /wheels_rpm.
+This node employs a callbacks of the dynamic reconfigure server to set the parameters of the robot, in order to calibrate them.
+It computes the velocities of the wheels by inverting the formulas previously used in vel node and multiplying by the conversion factor 60/2π to get them in RPM (revolution per minute).
 
+
+
+In the launch folder it is provided a launch file, named project1.launch (see below for details).
 
 ----------------------------------PARAMETERS------------------------------------
 
 launch file:     - initial_pose_x        // value = 0.0
 		 - initial_pose_y        // value = 0.0
 		 - initial_pose_theta    // value = 0.0
-		 - use_sym_time          // value = true
 
-dynamic reconfigure: - integration_method // {Euler, Runge_Kutta}
+dynamic reconfigure: - integration_methods // {Euler, Runge_Kutta}
+		     - parameters_calibration // {l, w, r, T, N}
 
 The initial pose of the robot is set via three ROS parameters in the launch file: initial_pose_x, initial_pose_y and initial_pose_theta.
-They are referred to the odom reference system, and so they are all set to 0.0 (also for compatibility with the odometry provided by the manufacturer, published in /scout_odom, where the initial pose of the robot in the odom reference system is (0,0,0)).
-In the launch file the use_sim_time parameter is initialized with ‘true’, so that the ROS client libraries will use a simulated clock that fits with the bag data instead of the system’s clock of the computer where they are executed.
 
-Another parameter defines the integration method used in the odometry estimate (Euler or Runge-Kutta); this parameter can be set by dynamic reconfigure at runtime, so it is described in the parameters.cfg file.
-The integration_method is described by an enumeration with two values: Euler and Runge_Kutta (NB: not Runge-Kutta), that corresponds to the integer values 0 and 1. The default is Euler.
+
+
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+They are referred to the odom reference system, and so they are all set to 0.0. 
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+
+
+
+Another parameter defines the integration method used in the odometry estimate (Euler or Runge-Kutta); this parameter can be set by dynamic reconfigure at runtime, so it is described in the integration_methods.cfg file.
+The int_choice is described by an enumeration with two values: Euler and RK, that corresponds to the integer values 0 and 1. The default is Euler.
+The parameters which describe the robot are defined in parameters_calibration.cfg and can be set by dynamic reconfigure at runtime.
 
 
 ------------------------------------TF TREE-------------------------------------
 
+
+
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+rosrun tf view_frames
+evince frames.pdf
 world ----- > odom ---- > base_link
 
 The root of the tree is the world reference system, which the /gt_pose data are referred to.
@@ -121,82 +102,71 @@ The world reference system has a child, the odom reference system, a fixed frame
 As both the world and the odom reference systems are fixed, the transformation between them is static, and it is provided by a static_transform_publisher which is launched by the launch file.
 The base_link reference system is the mobile reference system placed in the center of the robot, whose x-axis is oriented in the forward direction of the robot’s movement.
 The (dynamic) transformation between odom and base_link is published by the pub_odometry node through a tf::TransformBroadcaster.
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+
+
+
 
 
 --------------------------------CUSTOM MESSAGE----------------------------------
 
-The odom node publishes in the /odometry_cust* OdometryWithIntegrationMethod* messages, which are defined in the param.msg file in the msg folder as follows: 
+The node inversevel publishes the wheels speed in rpm are defined in the w_rpm.msg file as follows:
 
 Header      header
-float64     lw
-float64     Tr
-float64     N
-
-And the wheels speed in rpm are defined in the w_rpm.msg file as follows:
-
- Header      header
 float64     rpm_fl
 float64     rpm_fr
 float64     rpm_rr
 float64     rpm_rl
 
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 odom: contains the estimated odometry (pose and velocities) of the robot
-method: “euler*” or “rk*”, depending on the integration method used to compute the odometry
-
+nav_msgs::Odometry odom
+geometry_msgs::TwistStamped cmd_vel
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 ---------------------------HOW TO START/USE THE NODES---------------------------
 
-The launch file provided starts both the nodes pub_velocities and pub_odometry, a static_transform_publisher that publishes the static transformation between world and odom and sets the static parameters use_sym_time, initial_pose_x, initial_pose_y and initial_pose_theta.
+The launch file provided starts all the nodes, vel, odom, inversevel, a static_transform_publisher that publishes the static transformation between world and odom and sets the static parameters initial_pose_x, initial_pose_y and initial_pose_theta.
 So, in order to test the project with the bag1.bag data, it is only necessary to type in two different terminals (in the ROS workspace) the following commands: 
 
-roslaunch Robotics_project1.launch
+roslaunch Robotics_project1 project1.launch
 
 rosbag play -–clock “PATH_TO_THE_BAG/bag1.bag”
 
+It is possible to do the same with the other bags as well.
+
 It is possible to change the integration method with dynamic reconfigure typing in a terminal: 
 
-rosrun dynamic_reconfigure dynparam set /pub_odometry integration_method value
+rosrun dynamic_reconfigure dynparam set /odom int_choice value
 
 where value can be Euler or Runge_Kutta. Another way is through the rqt graphic tool:
 
 rosrun rqt_reconfigure rqt_reconfigure
 
-It is possible to call the ResetOdometryToZero service typing in a terminal the command:
+It is possible to change the parameters of the robot l, w, r, T, N with dynamic reconfigure typing in a terminal:
+
+rosrun rqt_reconfigure rqt_reconfigure
+
+It is possible to call the Reset_odom service typing in a terminal the command:
+
+rosservice call /Reset_odom x y theta
+
+
+
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Analogously, ResetOdometryToZero can be called through:
 
 rosservice call /ResetOdometryToZero
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
-Analogously, ResetOdometryToGivenPose can be called through:
 
-rosservice call /ResetOdometryToGivenPose x y theta
 
 where x, y and theta are the inputs of the service.
-Both the services can be called by a service client node as well.
 
 
 
-----------------GEAR RATIO AND APPARENT BASELINE ESTIMATE-----------------------
-????ANCHE NO
 
-To compute the odometry, it has been necessary to estimate 2 parameters:
-- gear ratio -> ratio between wheels angular velocities and the motors ones;
-- apparent baseline -> distance between ICR,l and ICR,r according to the kinematics model of a skid-steering vehicle.
-
-Data has been extracted from the provided bag1.bag file (bag2 and bag3 have not been used) and imported in a Matlab file.
-Both the estimates used /scout_odom values. The process is:
-- the sign of left motor wheels data has been changed since they rotate in the opposite direction of right motor wheels and have been converted from RPM to rad/s;
-- for every instant of time, w_l, the average value of motor speeds on the left side, and w_r ,  the average value of motor speeds on the right one, have been computed;
-- for each instant of time, the gear ratio has been calculated using the differential drive kinematics formula: 
-	gear ratio: (2 * v_x) / ((w_l + w_r) * r);
-where v_x is the linear velocity of the robot and r is the radius of the wheels.
-- gear ratio has been estimated with the mean of these values removing conveniently eventual outliers; the value obtained is: 0.0262;
-- Using the found value of gear ratio, we computed the linear velocities of left and right wheels for each instant of time: v_l and v_r;
-- for each instant of time in which the robot is not neither fixed nor moving with a straight trajectory, we computed the apparent baseline with the differential drive kinematics formula:
-app_baseline = (v_r – v_l) / w_z
-where w_z is the angular velocity of the robot according to /scout_odom;
-- apparent baseline has been estimated with the mean of these values; the value obtained is: 1. 0173.
-
-----------------ADDITIONAL AND IMPORTANT INFORMATIONS---------------------------
-
-????ANCHE NO
+Both the services can be called by a service client node as well. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 

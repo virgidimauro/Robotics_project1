@@ -39,7 +39,7 @@ class vel{ //header of the class
 
       last_time = 0;
 
-      sub = n.subscribe("/wheel_states", 1, &vel::CalcluateVelocityCallback, this);
+      sub = n.subscribe("/wheel_states", 1, &vel::vel_computation_Callback, this);
       pub = n.advertise<geometry_msgs::TwistStamped>("/cmd_vel", 1);
 
       /*dynamic reconfigure*/

@@ -42,9 +42,9 @@ private:
 
 	ros::Time next_time,previous_time;
 
-	double initial_pose_x;
-	double initial_pose_y;
-	double initial_pose_theta;
+	//double initial_pose_x;
+	//double initial_pose_y;
+	//double initial_pose_theta;
 
 	int int_choice;
 	double x,y,theta;
@@ -61,12 +61,6 @@ private:
 		this->ome=cmd_vel-> twist.angular.z;
 		this->previous_time = this->next_time;
 	};
-
-/*void reset_odom_to_initial_pose(Robotics_project1::Reset_odom_to_::Request& request,Robotics_project1::Reset_odom::Response& response){
-		this->x=n.getParam("/initial_pose_x", initial_pose_x);
-		this->y=n.getParam("/initial_pose_y", initial_pose_y);
-		this->theta=n.getParam("/initial_pose_theta", initial_pose_theta);
-	};*/
 
 	/*Ros service callbacks*/
 	bool odomReset_Callback(Robotics_project1::Reset_odom::Request& request,Robotics_project1::Reset_odom::Response& response){
@@ -206,23 +200,10 @@ private:
 	//void BroadcastTF(const std::string& frame_id, const std::string& child_id, )
 
 public:
-	void main_function(void){
-
-		//Recover parameters from Ros parameter server (inital_pose.yaml)
-		/*std::string name;
-		std::string shortname="OmnidirectionalRobot/initial_pose";
-
-		name= shortname+"/x";
-		if (false==n.getParam(name,x))
-			ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());
-
-		name= shortname+"/y";
-		if (false==n.getParam(name,y))
-			ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());
-
-		name= shortname+"/theta";
-		if (false==n.getParam(name,theta))
-			ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());*/
+	odom(){
+		this->n.getParam("/initial_pose_x", this->x);
+		this->n.getParam("/initial_pose_y", this->y);
+		this->n.getParam("/initial_pose_theta", this->theta);
 
 		/*ROS topics */
 		this->sub = this->n.subscribe("/cmd_vel", 10, &odom::inputMsg_Callback, this);
@@ -246,14 +227,59 @@ public:
 
 		this->int_choice = 0;
 
-		//ROS_INFO("Node %s ready to run", ros::this_node::getName().c_str());
 	};
+	/*void main_function(void){
+
+		//this->x=n.getParam("/initial_pose_x", initial_pose_x);
+		//this->y=n.getParam("/initial_pose_y", initial_pose_y);
+		//this->theta=n.getParam("/initial_pose_theta", initial_pose_theta);
+
+		//Recover parameters from Ros parameter server (inital_pose.yaml)
+		/*std::string name;
+		std::string shortname="OmnidirectionalRobot/initial_pose";
+
+		name= shortname+"/x";
+		if (false==n.getParam(name,x))
+			ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());
+
+		name= shortname+"/y";
+		if (false==n.getParam(name,y))
+			ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());
+
+		name= shortname+"/theta";
+		if (false==n.getParam(name,theta))
+			ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());*/
+
+		/*ROS topics */
+		/*this->sub = this->n.subscribe("/cmd_vel", 10, &odom::inputMsg_Callback, this);
+		this->pub = this->n.advertise<nav_msgs::Odometry>("/odom", 1);
+
+		/*Ros services*/
+		/*this->server = this->n.advertiseService("Reset_odom", &odom::odomReset_Callback, this);
+
+		/*dynamic reconfigure*/
+		/*dynamic_reconfigure::Server<Robotics_project1::integration_methodsConfig>::CallbackType f;
+		f = boost::bind(&odom::reconfig_Callback, this, _1, _2);
+		dynServer.setCallback(f);
+
+		/* Initialize node state */
+		/*this->next_time = ros::Time::now();
+		this->previous_time = ros::Time::now(); 
+
+		this->vel_x = 0.0;
+		this->vel_y = 0.0;
+		this->ome = 0.0;
+
+		this->int_choice = 0;
+
+		//ROS_INFO("Node %s ready to run", ros::this_node::getName().c_str());
+	};*/
 };
 
 int main(int argc, char **argv){
 	ros::init(argc, argv, "odom");
 	odom odom_node;
-	odom_node.main_function();
+	//odom_node.main_function();
 	//Wait other nodes start
 	sleep (1.0);
 	ros::spin();

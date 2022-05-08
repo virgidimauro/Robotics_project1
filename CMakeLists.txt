@@ -56,7 +56,6 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    w_rpm.msg
-   param.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -162,11 +161,6 @@ include_directories(
  add_executable(vel src/vel.cpp)
  add_dependencies(vel ${catkin_EXPORTED_TARGETS})
  target_link_libraries(vel ${catkin_LIBRARIES})
- 
-## reset client
-# add_executable(reset_client src/client.cpp)
-# add_dependencies(reset_client ${catkin_EXPORTED_TARGETS})
-# target_link_libraries(reset_client ${catkin_LIBRARIES})
  
 ## inverse velocity
  add_executable(inversevel src/inversevel.cpp)

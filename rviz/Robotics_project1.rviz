@@ -60,8 +60,6 @@ Visualization Manager:
         All Enabled: true
         base_link:
           Value: true
-        map:
-          Value: true
         odom:
           Value: true
         world:
@@ -73,10 +71,9 @@ Visualization Manager:
       Show Names: true
       Tree:
         world:
-          map:
-            odom:
-              base_link:
-                {}
+          odom:
+            base_link:
+              {}
       Update Interval: 0
       Value: true
     - Angle Tolerance: 0.10000000149011612
@@ -155,7 +152,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: -1.574999213218689
+      Angle: 0
       Class: rviz/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
@@ -165,11 +162,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 58.14545822143555
+      Scale: 46.96965408325195
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
-      X: 0.11786901950836182
-      Y: -0.42583635449409485
+      X: 0
+      Y: 0
     Saved: ~
 Window Geometry:
   Displays:
@@ -187,5 +184,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1469
-  X: 443
-  Y: 44
+  X: 175
+  Y: 147

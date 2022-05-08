@@ -9,10 +9,6 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
 
-/*#define INITIAL_POSE_X 0.0
-#define INITIAL_POSE_Y 0.0
-#define INITIAL_POSE_THETA 0.0 */
-
 /* 		
 		This node estimates the pose of the robot from the TwistStamped messages published in /cmd_vel, 
         and publishes /odom (nav_msgs/Odometry messages).
@@ -42,13 +38,8 @@ private:
 
 	ros::Time next_time,previous_time;
 
-	//double initial_pose_x;
-	//double initial_pose_y;
-	//double initial_pose_theta;
-
 	int int_choice;
 	double x,y,theta;
-	//double x_next,y_next,theta_next;
 	double vel_x,vel_y, ome;
 
 	/*Ros topic callbacks*/
@@ -116,72 +107,33 @@ private:
 		//ROS_INFO("Estimated pose is [%f,%f,%f], integrated with method %d, where 0 is Euler and 1 is Rugge-Kutta", (double)this->x, (double)this->y, (double)this->theta, this->int_choice);
 	};
 
-	/*void publish(void){
-		//transformation from odom reference frame to the base-link reference frame
-	     //Quaternion based on the the yaw of the robot
-	     tf2::Quaternion q;
-	     q.setRPY(0, 0, this->theta);
-
-	     //Publishing the transform over tf
-	     geometry_msgs::TransformStamped transformation;
-	     transformation.header.stamp = this->next_time;
-	     transformation.header.frame_id = "odom";
-	     transformation.child_frame_id = "base_link";
-
-	     transformation.transform.translation.x = this->x;
-	     transformation.transform.translation.y = this->y;
-	     transformation.transform.translation.z = 0.0;
-	     transformation.transform.rotation.x = q.x();
-	     transformation.transform.rotation.y = q.y();
-	     transformation.transform.rotation.z = q.z();
-	     transformation.transform.rotation.w = q.w();
-
-	     //Sending the transform
-	     broadc_odom.sendTransform(transformation);
-
-	     //Publishing the odometry message, needed for rviz
-	     nav_msgs::Odometry odom;
-	     odom.header.stamp = this->next_time;
-	     odom.header.frame_id = "odom";
-
-	     //Setting the pose
-	     odom.pose.pose.position.x = this->x;
-	     odom.pose.pose.position.y = this->y;
-	     odom.pose.pose.position.z = 0.0;
-	     odom.pose.pose.orientation = transformation.transform.rotation;
-
-	     //Setting the velocity
-	     odom.child_frame_id = "base_link";
-	     odom.twist.twist.linear.x = this->vel_x;
-	     odom.twist.twist.linear.y = this->vel_y;
-	     odom.twist.twist.linear.z = 0.0;
-	     odom.twist.twist.angular.x = 0.0;
-	     odom.twist.twist.angular.y = 0.0;
-	     odom.twist.twist.angular.z = this->ome;
-
-	     //Publishing the message to odom
-	     pub.publish(odom);
-	};*/
-
 	void publish(void){ 
+		//transformation from odom reference frame to the base-link reference frame
+
+		//Publishing the odometry message, needed for rviz
 		nav_msgs::Odometry odom= nav_msgs::Odometry();
-		//odom.header.seq= cmd_vel->header.seq; //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 		odom.header.stamp = this->next_time;
 	    odom.header.frame_id = "odom";
 	    odom.child_frame_id = "base_link";
+
+	    //Setting the pose.position
 	    odom.pose.pose.position.x = this->x;
 	    odom.pose.pose.position.y = this->y;
 
+	    //Quaternion based on the the yaw of the robot
 	    tf2::Quaternion q;
 	    q.setRPY(0, 0, this->theta);
+
+	    //Setting the pose.orientation
 	    odom.pose.pose.orientation.x = q.x();
 	    odom.pose.pose.orientation.y = q.y();
 	    odom.pose.pose.orientation.z = q.z();
 	    odom.pose.pose.orientation.w = q.w();
 
+	    //Publishing the message to odom
 	    pub.publish(odom);
 
-	    //BroadcastTF("odom", "base_link", this->x, this->y, this->theta, ros::Time::now());
+	    //Publishing the transform over tf
 	    geometry_msgs::TransformStamped tr;
 	    tr.header.stamp = ros::Time::now();
 	    tr.header.frame_id = "odom";
@@ -193,14 +145,16 @@ private:
 	    tr.transform.rotation.y = q.y();
 	    tr.transform.rotation.z = q.z();
 	    tr.transform.rotation.w = q.w();
+
+	    //Sending the transform
 	    br.sendTransform(tr);
 
 	};
 
-	//void BroadcastTF(const std::string& frame_id, const std::string& child_id, )
-
 public:
-	odom(){
+	odom(){ //constructor
+
+		/*Retrieving initial pose parameters from launch file*/
 		this->n.getParam("/initial_pose_x", this->x);
 		this->n.getParam("/initial_pose_y", this->y);
 		this->n.getParam("/initial_pose_theta", this->theta);
@@ -228,52 +182,6 @@ public:
 		this->int_choice = 0;
 
 	};
-	/*void main_function(void){
-
-		//this->x=n.getParam("/initial_pose_x", initial_pose_x);
-		//this->y=n.getParam("/initial_pose_y", initial_pose_y);
-		//this->theta=n.getParam("/initial_pose_theta", initial_pose_theta);
-
-		//Recover parameters from Ros parameter server (inital_pose.yaml)
-		/*std::string name;
-		std::string shortname="OmnidirectionalRobot/initial_pose";
-
-		name= shortname+"/x";
-		if (false==n.getParam(name,x))
-			ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());
-
-		name= shortname+"/y";
-		if (false==n.getParam(name,y))
-			ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());
-
-		name= shortname+"/theta";
-		if (false==n.getParam(name,theta))
-			ROS_ERROR("Node %s couldn't recover parameter %s",ros::this_node::getName().c_str(),name.c_str());*/
-
-		/*ROS topics */
-		/*this->sub = this->n.subscribe("/cmd_vel", 10, &odom::inputMsg_Callback, this);
-		this->pub = this->n.advertise<nav_msgs::Odometry>("/odom", 1);
-
-		/*Ros services*/
-		/*this->server = this->n.advertiseService("Reset_odom", &odom::odomReset_Callback, this);
-
-		/*dynamic reconfigure*/
-		/*dynamic_reconfigure::Server<Robotics_project1::integration_methodsConfig>::CallbackType f;
-		f = boost::bind(&odom::reconfig_Callback, this, _1, _2);
-		dynServer.setCallback(f);
-
-		/* Initialize node state */
-		/*this->next_time = ros::Time::now();
-		this->previous_time = ros::Time::now(); 
-
-		this->vel_x = 0.0;
-		this->vel_y = 0.0;
-		this->ome = 0.0;
-
-		this->int_choice = 0;
-
-		//ROS_INFO("Node %s ready to run", ros::this_node::getName().c_str());
-	};*/
 };
 
 int main(int argc, char **argv){

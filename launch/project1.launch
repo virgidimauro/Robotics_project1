@@ -16,6 +16,6 @@
 
   <node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0 0 0 0 0 0 1 world odom "   />
 
-  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find Robotics_project1)/rviz/Robotics_project1.rviz" >
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find Robotics_project1)/rviz/Robotics_project1.rviz" />
   
 </launch>

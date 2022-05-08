@@ -100,7 +100,6 @@ class inversevel  //header of the class
 			this->ome_rl=0;
 			this->ome_rr=0;
 			
-			//ROS_INFO("Node %s ready to run.", ros::this_node::getName().c_str());
 		};
 };
 
